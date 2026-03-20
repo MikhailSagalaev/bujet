@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ebudget_postgres
+    environment:
+      POSTGRES_USER: nocouser
+      POSTGRES_PASSWORD: nocopass
+      POSTGRES_DB: nocodb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ebudget_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nocouser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # NocoDB
+  nocodb:
+    image: nocodb/nocodb:latest
+    container_name: ebudget_nocodb
+    ports:
+      - "8080:8080"
+    environment:
+      NC_DB: "postgresql://nocouser:nocopass@postgres:5432/nocodb"
+      NC_PUBLIC_URL: "http://localhost:8080"
+      NC_AUTH_JWT_SECRET: "change-this-secret-in-production"
+      NC_DISABLE_TELE: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - nocodb_data:/usr/app/data
+    networks:
+      - ebudget_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend API
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ebudget_api
+    ports:
+      - "3000:3000"
+    environment:
+      NOCODB_URL: "http://nocodb:8080"
+      NOCODB_TOKEN: "${NOCODB_TOKEN}"
+      NOCODB_PROJECT_ID: "${NOCODB_PROJECT_ID}"
+      PORT: 3000
+      NODE_ENV: production
+      ALLOWED_ORIGINS: "https://e-budget.ru,http://localhost"
+      PURCHASE_BONUS: 300
+      REFERRAL_BONUS: 100
+    depends_on:
+      nocodb:
+        condition: service_healthy
+    networks:
+      - ebudget_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx (для статики виджетов и reverse proxy)
+  nginx:
+    image: nginx:alpine
+    container_name: ebudget_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./widget:/usr/share/nginx/html/widget:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    networks:
+      - ebudget_network
+    restart: unless-stopped
+
+networks:
+  ebudget_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  nocodb_data:
+    driver: local
