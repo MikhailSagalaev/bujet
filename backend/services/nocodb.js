@@ -26,7 +26,12 @@ class NocoDBService {
       );
 
       if (response.data.list && response.data.list.length > 0) {
-        return response.data.list[0];
+        const user = response.data.list[0];
+        // NocoDB возвращает Id с большой буквы, нормализуем
+        return {
+          ...user,
+          ID: user.Id || user.ID
+        };
       }
       return null;
     } catch (error) {
@@ -56,6 +61,8 @@ class NocoDBService {
    */
   async getUserCourses(userId, offset = 0, limit = 10) {
     try {
+      console.log('Getting courses for userId:', userId);
+      
       // Сначала получаем покупки пользователя
       const purchasesResponse = await axios.get(
         `${this.baseURL}/${config.nocodb.tables.purchases}`,
