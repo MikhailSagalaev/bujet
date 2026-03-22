@@ -7,7 +7,7 @@
 
   // Конфигурация
   const CONFIG = {
-    API_URL: 'https://your-server.ru/api',  // ИЗМЕНИТЬ НА ВАШ URL
+    API_URL: 'https://app.e-budget.ru/api',
     BLOCK_ID: '#rec556083146',  // ID блока Тільды
     ENDPOINT: '/widget/referrals'  // Можно менять: /widget/referrals, /widget/profile
   };
