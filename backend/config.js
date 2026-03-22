@@ -7,9 +7,9 @@ module.exports = {
     token: process.env.NOCODB_TOKEN,
     projectId: process.env.NOCODB_PROJECT_ID,
     tables: {
-      users: 'Users_Grid_view_csv',
-      courses: 'Курсы_Grid_view_csv',
-      purchases: 'Покупки_Grid_view_csv'
+      users: 'mv805taz8y6rws9',        // Users_Grid_view_csv
+      courses: 'mc1fdmzb4zs2om7',      // Курсы_Grid_view_csv
+      purchases: 'mkovcnkg9deyy80'     // Покупки_Grid_view_csv
     }
   },
 
