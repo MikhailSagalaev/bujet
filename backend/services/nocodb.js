@@ -59,17 +59,17 @@ class NocoDBService {
   /**
    * Получить курсы пользователя
    */
-  async getUserCourses(userId, offset = 0, limit = 10) {
+  async getUserCourses(userEmail, offset = 0, limit = 10) {
     try {
-      console.log('Getting courses for userId:', userId);
+      console.log('Getting courses for email:', userEmail);
       
-      // Сначала получаем покупки пользователя
+      // Ищем покупки по Email напрямую
       const purchasesResponse = await axios.get(
         `${this.baseURL}/${config.nocodb.tables.purchases}`,
         {
           headers: this.headers,
           params: {
-            where: `(Покупатель,eq,${userId})~and(Оплата,eq,Да)`,
+            where: `(Email,eq,${userEmail})`,
             offset: offset,
             limit: limit
           }
@@ -114,14 +114,14 @@ class NocoDBService {
   /**
    * Получить покупки пользователя
    */
-  async getUserPurchases(userId, offset = 0, limit = 10) {
+  async getUserPurchases(userEmail, offset = 0, limit = 10) {
     try {
       const response = await axios.get(
         `${this.baseURL}/${config.nocodb.tables.purchases}`,
         {
           headers: this.headers,
           params: {
-            where: `(Покупатель,eq,${userId})`,
+            where: `(Email,eq,${userEmail})`,
             offset: offset,
             limit: limit,
             sort: '-Created'

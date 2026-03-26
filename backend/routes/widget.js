@@ -30,7 +30,7 @@ router.post('/courses', async (req, res) => {
 
     // Получаем курсы
     const coursesData = await nocodbService.getUserCourses(
-      user.ID,
+      user_email,
       parseInt(offset),
       parseInt(limit)
     );
@@ -161,7 +161,7 @@ router.post('/purchases', async (req, res) => {
 
     // Получаем покупки
     const purchasesData = await nocodbService.getUserPurchases(
-      user.ID,
+      user_email,
       parseInt(offset),
       parseInt(limit)
     );
