@@ -17,6 +17,11 @@ router.post('/tilda', async (req, res) => {
     console.log('Headers:', JSON.stringify(req.headers, null, 2));
     console.log('='.repeat(50));
 
+    // Tilda sends {"test":"test"} to verify the endpoint
+    if (req.body.test) {
+      return res.json({ message: 'OK' });
+    }
+
     const {
       Email,
       Name,
@@ -24,7 +29,7 @@ router.post('/tilda', async (req, res) => {
       payment,
       course_id,
       amount,
-      utm_source  // ID реферала
+      utm_source
     } = req.body;
 
     // Проверяем обязательные поля
