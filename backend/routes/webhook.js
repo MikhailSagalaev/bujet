@@ -122,7 +122,12 @@ router.post('/tilda/signup', async (req, res) => {
   try {
     const { Email, Name, utm_source } = req.body;
 
-    if (!Email || !helpers.isValidEmail(Email)) {
+    // Тестовый запрос от Tilda при подключении webhook
+    if (!Email) {
+      return res.send('ok');
+    }
+
+    if (!helpers.isValidEmail(Email)) {
       return res.status(400).json({
         error: true,
         message: 'Invalid email'
