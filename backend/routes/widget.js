@@ -122,13 +122,9 @@ router.post('/profile', async (req, res) => {
       });
     }
 
-    // Генерируем HTML профиля
-    const html = helpers.generateProfileHTML(user);
-
     res.json({
-      records: [
-        { html: html }
-      ]
+      user: user,
+      records: [{ html: helpers.generateProfileHTML(user) }]
     });
   } catch (error) {
     helpers.handleAPIError(error, res);
