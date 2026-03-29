@@ -87,10 +87,10 @@ router.post('/referrals', async (req, res) => {
     // Генерируем HTML
     const html = helpers.generateReferralHTML(user, referralsData);
 
-    // Формируем ответ в формате Collabza
     res.json({
+      user: user,
       records: [
-        { html: html }
+        { html: helpers.generateReferralHTML(user, referralsData) }
       ]
     });
   } catch (error) {

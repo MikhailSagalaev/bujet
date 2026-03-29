@@ -98,7 +98,7 @@
         if (data.user) {
           fillData(data.user);
         } else {
-          console.error('[widget-cards] no data.user in response');
+          console.error('[widget-cards] no data.user in response:', JSON.stringify(data));
         }
       })
       .catch(function (err) {
