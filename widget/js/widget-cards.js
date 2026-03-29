@@ -1,96 +1,114 @@
 /**
  * Виджет карточек (аналог Collabza 5a68810f...)
- * Использование: для отображения реферальной информации, профиля и т.д.
+ * Показывает реферальную ссылку, бонусы, профиль пользователя
+ *
+ * Использование:
+ * <script src="https://app.e-budget.ru/widget/js/widget-cards.js"></script>
+ *
+ * Настройка через data-атрибуты на блоке:
+ * data-type="referrals"  — реферальная информация (по умолчанию)
+ * data-type="profile"    — профиль пользователя
+ *
+ * Пример:
+ * <div id="rec556083146" data-type="referrals"></div>
  */
-(function() {
+(function () {
   'use strict';
 
-  // Конфигурация
-  const CONFIG = {
-    API_URL: 'https://app.e-budget.ru/api',
-    BLOCK_ID: '#rec556083146',  // ID блока Тільды
-    ENDPOINT: '/widget/referrals'  // Можно менять: /widget/referrals, /widget/profile
+  const API_URL = 'https://app.e-budget.ru/api';
+
+  // Маппинг типов виджетов на API endpoints
+  const ENDPOINTS = {
+    referrals: '/widget/referrals',
+    profile: '/widget/profile',
   };
 
-  $(document).ready(function() {
-    const block_id = CONFIG.BLOCK_ID.substring(4);
-    const block = $(CONFIG.BLOCK_ID).removeClass('r_hidden');
-    
-    if (block.length === 0) {
-      console.error('Widget Error: Block not found:', CONFIG.BLOCK_ID);
+  function getProfile() {
+    const project_id = document.getElementById('allrecords')?.getAttribute('data-tilda-project-id');
+    try {
+      return JSON.parse(
+        localStorage.getItem('tilda_members_profile' + project_id) ||
+        localStorage.getItem('memberarea_profile') ||
+        '{}'
+      );
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function initWidget(blockEl) {
+    const block_id = blockEl.id.replace('rec', '');
+    const widgetType = blockEl.getAttribute('data-type') || 'referrals';
+    const endpoint = ENDPOINTS[widgetType];
+
+    if (!endpoint) {
+      console.error('Widget: unknown data-type "' + widgetType + '"');
       return;
     }
 
-    // Оборачиваем в контейнер
-    block.wrap(`<div id="rec${block_id}" class="r"></div>`).remove();
-    block.removeClass('r');
-    const container = $(`#rec${block_id}`);
+    // Оборачиваем блок в контейнер (как Collabza)
+    const wrapper = document.createElement('div');
+    wrapper.id = 'collabza_rec' + block_id;
+    wrapper.className = 'r';
+    blockEl.parentNode.insertBefore(wrapper, blockEl);
+    blockEl.classList.remove('r', 'r_hidden');
+    wrapper.appendChild(blockEl);
 
-    // Получаем профиль пользователя
-    const project_id = $('#allrecords').attr('data-tilda-project-id');
-    const profile = JSON.parse(
-      localStorage.getItem(`tilda_members_profile${project_id}`) ||
-      localStorage.getItem('memberarea_profile') ||
-      '{}'
-    );
+    const profile = getProfile();
+    const userEmail = profile.login ? decodeURIComponent(profile.login) : null;
 
-    if (!profile.login) {
-      console.error('Widget Error: User not logged in');
-      container.html('<p style="text-align:center; padding:20px;">Пожалуйста, войдите в систему</p>');
+    if (!userEmail) {
+      blockEl.innerHTML = '<p style="text-align:center;padding:20px;">Пожалуйста, войдите в систему</p>';
       return;
     }
 
-    // Показываем загрузку
-    container.html('<div style="text-align:center; padding:40px;"><div class="t-preloader__spinner"></div></div>');
-
-    // Загружаем данные
-    $.ajax({
-      url: CONFIG.API_URL + CONFIG.ENDPOINT,
+    // Запрос к API
+    fetch(API_URL + endpoint, {
       method: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({
-        user_email: decodeURIComponent(profile.login)
-      }),
-      success: function(data) {
-        container.empty();
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_email: userEmail })
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!data.records || data.records.length === 0) return;
 
-        if (!data.records || data.records.length === 0) {
-          container.html('<p style="text-align:center; padding:40px;">Нет данных для отображения</p>');
-          return;
-        }
+        // Клонируем блок для каждой записи (как Collabza)
+        data.records.forEach(function (record, index) {
+          const item = blockEl.cloneNode(true);
+          item.id = 'rec' + block_id + '_' + index;
 
-        // Для каждой записи клонируем блок
-        data.records.forEach(function(record, index) {
-          const item = block.clone(true).attr('id', `rec${block_id}_${index}`);
-          
+          // Ищем контейнер для HTML (T123 блок)
+          const inner = item.querySelector('.t123 > div > div') || item;
           if (record.html) {
-            // Вставляем HTML в блок T123
-            const contentDiv = item.find('.t123 > div > div');
-            if (contentDiv.length > 0) {
-              contentDiv.html(record.html);
-            } else {
-              // Если структура другая, пробуем найти первый div
-              item.find('div').first().html(record.html);
-            }
+            inner.innerHTML = record.html;
           }
-          
-          item.appendTo(container);
+
+          wrapper.appendChild(item);
+          window.dispatchEvent(new Event('resize'));
         });
 
-        // Триггерим событие resize
-        $(window).trigger('resize');
-        window.dispatchEvent(new Event('resize'));
-        
-        // Кастомное событие
-        container.trigger('collabza_loaded');
-      },
-      error: function(xhr) {
-        console.error('Widget Error:', xhr);
-        const errorMsg = xhr.responseJSON?.message || 'Ошибка загрузки данных';
-        container.html(
-          `<p style="text-align:center; padding:40px; color:#e74c3c;">${errorMsg}</p>`
-        );
+        // Убираем оригинальный пустой блок
+        blockEl.remove();
+      })
+      .catch(function (err) {
+        console.error('Widget error:', err);
+        blockEl.innerHTML = '<p style="text-align:center;padding:20px;color:#e74c3c;">Ошибка загрузки данных</p>';
+      });
+  }
+
+  // Инициализируем все блоки с data-type на странице
+  function init() {
+    const blocks = document.querySelectorAll('[data-type="referrals"], [data-type="profile"]');
+    blocks.forEach(function (block) {
+      if (block.id) {
+        initWidget(block);
       }
     });
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
