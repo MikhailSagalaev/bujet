@@ -1,33 +1,51 @@
 /**
- * Виджет карточек (аналог Collabza 5a68810f...)
- * Показывает реферальную ссылку, бонусы, профиль пользователя
+ * Виджет карточек — реферальная ссылка, профиль, бонусы
  *
- * Использование:
- * <script src="https://app.e-budget.ru/widget/js/widget-cards.js"></script>
+ * Использование в HTML-блоке Tilda (T123):
  *
- * Настройка через data-атрибуты на блоке:
- * data-type="referrals"  — реферальная информация (по умолчанию)
- * data-type="profile"    — профиль пользователя
+ * Вариант 1 — реферальная программа:
+ * <script data-type="referrals" src="https://app.e-budget.ru/widget/js/widget-cards.js"></script>
  *
- * Пример:
- * <div id="rec556083146" data-type="referrals"></div>
+ * Вариант 2 — профиль пользователя:
+ * <script data-type="profile" src="https://app.e-budget.ru/widget/js/widget-cards.js"></script>
+ *
+ * Скрипт сам найдёт свой тег и вставит данные в родительский блок.
  */
 (function () {
   'use strict';
 
   const API_URL = 'https://app.e-budget.ru/api';
 
-  // Маппинг типов виджетов на API endpoints
   const ENDPOINTS = {
     referrals: '/widget/referrals',
     profile: '/widget/profile',
   };
 
+  // Находим текущий тег <script> чтобы понять тип виджета и куда вставлять
+  var scripts = document.querySelectorAll('script[src*="widget-cards.js"]');
+  var currentScript = scripts[scripts.length - 1];
+  var widgetType = (currentScript && currentScript.getAttribute('data-type')) || 'referrals';
+  var endpoint = ENDPOINTS[widgetType];
+
+  if (!endpoint) {
+    console.error('widget-cards: unknown data-type "' + widgetType + '"');
+    return;
+  }
+
+  // Контейнер — родительский элемент тега script
+  var container = currentScript && currentScript.parentNode;
+  if (!container) {
+    console.error('widget-cards: no parent container found');
+    return;
+  }
+
   function getProfile() {
-    const project_id = document.getElementById('allrecords')?.getAttribute('data-tilda-project-id');
+    var projectId = '';
+    var allrecords = document.getElementById('allrecords');
+    if (allrecords) projectId = allrecords.getAttribute('data-tilda-project-id') || '';
     try {
       return JSON.parse(
-        localStorage.getItem('tilda_members_profile' + project_id) ||
+        localStorage.getItem('tilda_members_profile' + projectId) ||
         localStorage.getItem('memberarea_profile') ||
         '{}'
       );
@@ -36,33 +54,22 @@
     }
   }
 
-  function initWidget(blockEl) {
-    const block_id = blockEl.id.replace('rec', '');
-    const widgetType = blockEl.getAttribute('data-type') || 'referrals';
-    const endpoint = ENDPOINTS[widgetType];
+  function render(html) {
+    var div = document.createElement('div');
+    div.className = 'ebudget-widget';
+    div.innerHTML = html;
+    container.appendChild(div);
+  }
 
-    if (!endpoint) {
-      console.error('Widget: unknown data-type "' + widgetType + '"');
-      return;
-    }
-
-    // Оборачиваем блок в контейнер (как Collabza)
-    const wrapper = document.createElement('div');
-    wrapper.id = 'collabza_rec' + block_id;
-    wrapper.className = 'r';
-    blockEl.parentNode.insertBefore(wrapper, blockEl);
-    blockEl.classList.remove('r', 'r_hidden');
-    wrapper.appendChild(blockEl);
-
-    const profile = getProfile();
-    const userEmail = profile.login ? decodeURIComponent(profile.login) : null;
+  function load() {
+    var profile = getProfile();
+    var userEmail = profile.login ? decodeURIComponent(profile.login) : null;
 
     if (!userEmail) {
-      blockEl.innerHTML = '<p style="text-align:center;padding:20px;">Пожалуйста, войдите в систему</p>';
+      render('<p style="text-align:center;padding:20px;">Пожалуйста, войдите в систему</p>');
       return;
     }
 
-    // Запрос к API
     fetch(API_URL + endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -71,44 +78,21 @@
       .then(function (res) { return res.json(); })
       .then(function (data) {
         if (!data.records || data.records.length === 0) return;
-
-        // Клонируем блок для каждой записи (как Collabza)
-        data.records.forEach(function (record, index) {
-          const item = blockEl.cloneNode(true);
-          item.id = 'rec' + block_id + '_' + index;
-
-          // Ищем контейнер для HTML (T123 блок)
-          const inner = item.querySelector('.t123 > div > div') || item;
-          if (record.html) {
-            inner.innerHTML = record.html;
-          }
-
-          wrapper.appendChild(item);
-          window.dispatchEvent(new Event('resize'));
+        data.records.forEach(function (record) {
+          if (record.html) render(record.html);
         });
-
-        // Убираем оригинальный пустой блок
-        blockEl.remove();
+        window.dispatchEvent(new Event('resize'));
       })
       .catch(function (err) {
-        console.error('Widget error:', err);
-        blockEl.innerHTML = '<p style="text-align:center;padding:20px;color:#e74c3c;">Ошибка загрузки данных</p>';
+        console.error('widget-cards error:', err);
+        render('<p style="text-align:center;padding:20px;color:#e74c3c;">Ошибка загрузки данных</p>');
       });
   }
 
-  // Инициализируем все блоки с data-type на странице
-  function init() {
-    const blocks = document.querySelectorAll('[data-type="referrals"], [data-type="profile"]');
-    blocks.forEach(function (block) {
-      if (block.id) {
-        initWidget(block);
-      }
-    });
-  }
-
+  // Запускаем после загрузки DOM
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', load);
   } else {
-    init();
+    load();
   }
 })();
