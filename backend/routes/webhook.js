@@ -17,11 +17,6 @@ router.post('/tilda', async (req, res) => {
     console.log('Headers:', JSON.stringify(req.headers, null, 2));
     console.log('='.repeat(50));
 
-    // Tilda sends {"test":"test"} to verify the endpoint
-    if (req.body.test) {
-      return res.json({ message: 'OK' });
-    }
-
     const {
       Email,
       Name,
@@ -32,8 +27,15 @@ router.post('/tilda', async (req, res) => {
       utm_source
     } = req.body;
 
-    // Проверяем обязательные поля
-    if (!Email || !helpers.isValidEmail(Email)) {
+    // Если нет Email - это тестовый запрос от Tilda при подключении webhook
+    // Просто отвечаем "ok" как требует документация Tilda
+    if (!Email) {
+      console.log('Test request from Tilda - responding with "ok"');
+      return res.send('ok');
+    }
+
+    // Проверяем валидность email
+    if (!helpers.isValidEmail(Email)) {
       return res.status(400).json({
         error: true,
         message: 'Invalid email'
