@@ -1,15 +1,12 @@
 /**
  * Виджет личного кабинета для блока T396 (#rec543521496)
- * Заполняет данные пользователя в существующие элементы Tilda
- *
- * Использование — вставить в HTML-блок на странице:
- * <script src="https://app.e-budget.ru/widget/js/widget-cards.js"></script>
+ * v4 - с логированием для отладки
  */
 (function () {
   'use strict';
 
   var API_URL = 'https://app.e-budget.ru/api';
-  var REC_ID = '543521496'; // ID блока T396
+  var REC_ID = '543521496';
 
   function getProfile() {
     var projectId = '';
@@ -24,11 +21,11 @@
     } catch (e) { return {}; }
   }
 
-  // Найти элемент блока по data-elem-id
   function elem(elemId) {
-    return document.querySelector(
-      '#rec' + REC_ID + ' .tn-elem__' + REC_ID + elemId + ' .tn-atom'
-    );
+    var sel = '#rec' + REC_ID + ' .tn-elem__' + REC_ID + elemId + ' .tn-atom';
+    var el = document.querySelector(sel);
+    if (!el) console.warn('[widget-cards] NOT FOUND:', sel);
+    return el;
   }
 
   function setText(elemId, text) {
@@ -37,11 +34,11 @@
   }
 
   function fillData(user) {
-    // Имя
+    console.log('[widget-cards] fillData user:', user);
+
     var name = user['Имя'] || user['Name'] || 'Пользователь';
     setText('1675010500282', 'Привет, <span>' + name + '</span>!');
 
-    // Тариф и дата продления
     var tariff = user['Тариф'] || '🥈Базовый';
     var renewal = user['Дата продления'] || '';
     if (renewal) {
@@ -53,13 +50,12 @@
       '<strong>Дата продления:</strong> ' + (renewal || 'не указана')
     );
 
-    // Реферальная ссылка
     var refLink = 'https://e-budget.ru/?r=' + (user['Id'] || user['ID'] || '');
+    console.log('[widget-cards] refLink:', refLink);
     var btnEl = elem('1675015783157');
     if (btnEl) {
       btnEl.innerHTML = refLink;
       btnEl.style.cursor = 'pointer';
-      btnEl.title = 'Нажмите чтобы скопировать';
       btnEl.onclick = function () {
         navigator.clipboard.writeText(refLink).then(function () {
           var orig = btnEl.innerHTML;
@@ -69,37 +65,55 @@
       };
     }
 
-    // Счётчики рефералов
-    setText('1675016424996', user['Количество рефералов'] || '0');
-    setText('1675016455904', user['Оплатили подписку'] || '0');
-
-    // Бонусы
+    setText('1675016424996', String(user['Количество рефералов'] || '0'));
+    setText('1675016455904', String(user['Оплатили подписку'] || '0'));
     setText('1676984464176', (user['Бонусы'] || '0') + ' б.');
   }
 
   function init() {
-    var profile = getProfile();
-    var userEmail = profile.login ? decodeURIComponent(profile.login) : null;
+    console.log('[widget-cards] v4 init');
 
-    if (!userEmail) return; // не авторизован — ничего не делаем
+    var profile = getProfile();
+    console.log('[widget-cards] profile:', profile);
+
+    var userEmail = profile.login ? decodeURIComponent(profile.login) : null;
+    if (!userEmail) {
+      console.warn('[widget-cards] no email in profile, skipping');
+      return;
+    }
+
+    console.log('[widget-cards] fetching profile for:', userEmail);
 
     fetch(API_URL + '/widget/profile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_email: userEmail })
     })
-      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        console.log('[widget-cards] API response status:', res.status);
+        return res.json();
+      })
       .then(function (data) {
-        if (data.user) fillData(data.user);
+        console.log('[widget-cards] API data:', data);
+        if (data.user) {
+          fillData(data.user);
+        } else {
+          console.error('[widget-cards] no data.user in response');
+        }
       })
       .catch(function (err) {
-        console.error('widget-cards error:', err);
+        console.error('[widget-cards] fetch error:', err);
       });
   }
 
+  // Запускаем с небольшой задержкой чтобы T396 успел отрендериться
+  function delayedInit() {
+    setTimeout(init, 500);
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', delayedInit);
   } else {
-    init();
+    delayedInit();
   }
 })();
