@@ -91,7 +91,7 @@ router.post('/tilda', async (req, res) => {
         renewalDate.setMonth(renewalDate.getMonth() + 1);
         const renewalStr = renewalDate.toISOString().split('T')[0];
         await nocodbService.updateUser(user.Id, {
-          'Тариф': '🏆Про',
+          'Тариф': '🥇Про',
           'Дата продления': renewalStr
         });
         await nocodbService.updateUserBonuses(user.Id, bonusAmount);
