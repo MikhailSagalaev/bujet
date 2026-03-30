@@ -96,11 +96,15 @@ router.post('/tilda', async (req, res) => {
       // Если есть реферал - начисляем бонусы рефералу
       if (user['Кто привёл']) {
         const referralBonus = config.bonuses.referral;
-        await nocodbService.updateUserBonuses(user['Кто привёл'], referralBonus);
-        console.log(`Referral bonus added to ${user['Кто привёл']}: ${referralBonus}`);
-        
-        // Обновляем счётчик оплативших у реферала
-        await nocodbService.updateReferralCount(user['Кто привёл']);
+        // Находим реферала по его реферальному коду/ID
+        const referrer = await nocodbService.getUserById(user['Кто привёл']);
+        if (referrer && referrer.Id) {
+          await nocodbService.updateUserBonuses(referrer.Id, referralBonus);
+          console.log(`Referral bonus added to user ${referrer.Id}: ${referralBonus}`);
+          await nocodbService.updateReferralCount(referrer.Id);
+        } else {
+          console.warn('Referrer not found for:', user['Кто привёл']);
+        }
       }
     }
 

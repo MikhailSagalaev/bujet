@@ -199,19 +199,22 @@ class NocoDBService {
         console.error('updateUserBonuses: userId is empty, skipping');
         return;
       }
-      // Сначала получаем текущие бонусы
-      const user = await this.getUserById(userId);
+      const numericId = parseInt(userId);
+      if (!numericId) {
+        console.error('updateUserBonuses: userId is not numeric:', userId);
+        return;
+      }
+      const user = await this.getUserById(numericId);
       const currentBonuses = user.Бонусы || 0;
       const newBonuses = currentBonuses + bonusAmount;
 
-      console.log(`Updating bonuses for user ${userId}: ${currentBonuses} + ${bonusAmount} = ${newBonuses}`);
+      console.log(`Updating bonuses for user ${numericId}: ${currentBonuses} + ${bonusAmount} = ${newBonuses}`);
 
       const response = await axios.patch(
-        `${this.baseURL}/${config.nocodb.tables.users}/${userId}`,
+        `${this.baseURL}/${config.nocodb.tables.users}/${numericId}`,
         { Бонусы: newBonuses },
         { headers: this.headers }
       );
-      
       return response.data;
     } catch (error) {
       console.error('Error updating user bonuses:', error.message);
