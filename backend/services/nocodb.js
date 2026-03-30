@@ -245,6 +245,23 @@ class NocoDBService {
   }
 
   /**
+   * Обновить произвольные поля пользователя
+   */
+  async updateUser(userId, fields) {
+    try {
+      const response = await axios.patch(
+        `${this.baseURL}/${config.nocodb.tables.users}/${userId}`,
+        fields,
+        { headers: this.headers }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error updating user:', error.message);
+      throw error;
+    }
+  }
+
+  /**
    * Создать пользователя
    */
   async createUser(userData) {
