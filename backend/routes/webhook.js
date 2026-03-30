@@ -84,30 +84,25 @@ router.post('/tilda', async (req, res) => {
     // Если это покупка подписки
     if (order_id && isPaid && (subscription || podpiska)) {
       const bonusAmount = helpers.calculatePurchaseBonuses(amount, config);
+      const renewalDate = new Date();
+      renewalDate.setMonth(renewalDate.getMonth() + 1);
+      const renewalStr = renewalDate.toISOString().split('T')[0];
 
-      if (!isBankTransfer) {
-        // Карта — активируем сразу
-        const renewalDate = new Date();
-        renewalDate.setMonth(renewalDate.getMonth() + 1);
-        const renewalStr = renewalDate.toISOString().split('T')[0];
-        await nocodbService.updateUser(user.Id, {
-          'Тариф': '🥇Про',
-          'Дата продления': renewalStr
-        });
-        await nocodbService.updateUserBonuses(user.Id, bonusAmount);
-        console.log(`Subscription activated for user ${user.Id} until ${renewalStr}`);
-      } else {
-        // По счёту — только создаём запись, доступ не открываем
-        console.log(`Subscription pending payment for user ${user.Id}`);
-      }
+      // Активируем тариф сразу — при banktransfer клиент обязуется оплатить
+      await nocodbService.updateUser(user.Id, {
+        'Тариф': '🥇Про',
+        'Дата продления': renewalStr
+      });
+      console.log(`Subscription activated for user ${user.Id} until ${renewalStr}`);
 
-      // Сохраняем запись о заказе подписки
+      await nocodbService.updateUserBonuses(user.Id, bonusAmount);
+
       await nocodbService.createPurchase({
         Email: Email,
         order_id: order_id.toString(),
         Оплата: paymentStatus,
         Users_id: user.Id,
-        'Бонусы начислить': isBankTransfer ? 0 : bonusAmount,
+        'Бонусы начислить': bonusAmount,
         'Название курса': 'Подписка Про'
       });
     }
