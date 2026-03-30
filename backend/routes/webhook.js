@@ -18,7 +18,6 @@ router.post('/tilda', async (req, res) => {
     console.log('='.repeat(50));
 
     const {
-      Email,
       Name,
       course_id,
       subscription,
@@ -26,6 +25,9 @@ router.post('/tilda', async (req, res) => {
       utm_source,
       payment: paymentData
     } = req.body;
+
+    // Tilda может передавать email в разных полях
+    const Email = req.body.Email || req.body.ma_email || req.body.email;
 
     // Если нет Email - это тестовый запрос от Tilda при подключении webhook
     if (!Email) {
