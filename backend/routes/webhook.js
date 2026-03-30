@@ -22,6 +22,7 @@ router.post('/tilda', async (req, res) => {
       Name,
       course_id,
       subscription,
+      podpiska,
       utm_source,
       payment: paymentData
     } = req.body;
@@ -75,13 +76,13 @@ router.post('/tilda', async (req, res) => {
     }
 
     // Если это покупка подписки
-    if (order_id && isPaid && subscription) {
+    if (order_id && isPaid && (subscription || podpiska)) {
       const renewalDate = new Date();
       renewalDate.setMonth(renewalDate.getMonth() + 1);
       const renewalStr = renewalDate.toISOString().split('T')[0];
 
       await nocodbService.updateUser(user.Id, {
-        'Тариф': '🥇Расширенный',
+        'Тариф': '🏆Про',
         'Дата продления': renewalStr
       });
       console.log(`Subscription activated for user ${user.Id} until ${renewalStr}`);
