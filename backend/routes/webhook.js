@@ -81,8 +81,8 @@ router.post('/tilda', async (req, res) => {
         Email: Email,
         order_id: order_id.toString(),
         Оплата: 'Да',
-        Покупатель: user.Id,
-        'ID курса': course_id,
+        Users_id: user.Id,
+        Courses_id: parseInt(course_id),
         'Бонусы начислить': bonusAmount
       };
 

@@ -105,11 +105,11 @@ function generateProfileHTML(user) {
 }
 
 /**
- * Расчёт бонусов за покупку
+ * Расчёт бонусов за покупку — 1% от суммы
  */
 function calculatePurchaseBonuses(amount, config) {
-  // Можно добавить логику расчёта в зависимости от суммы
-  return config.bonuses.purchase;
+  if (!amount) return 0;
+  return Math.floor(parseFloat(amount) * 0.01);
 }
 
 /**
