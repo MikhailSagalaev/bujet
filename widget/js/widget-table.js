@@ -120,8 +120,13 @@
             block.find('.t431__table tbody').empty();
           }
 
-          // Инициализируем таблицу Тільды
+          // Инициализируем таблицу Тильды
           if (typeof t431_init === 'function') {
+            // Убираем дублирующийся thead перед реинициализацией
+            var theads = block.find('.t431__table thead');
+            if (theads.length > 1) {
+              theads.not(':first').remove();
+            }
             t431_init(block_id);
           }
 
