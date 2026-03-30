@@ -103,19 +103,19 @@
             return;
           }
 
-          // Генерируем HTML таблицы
-          let tableHTML = '';
+          // Генерируем текст для t431__data-part2 (формат Tilda)
+          let tableText = '';
           data.records.forEach(function(record) {
             if (record.table_content) {
-              tableHTML += record.table_content + '\n';
+              tableText += record.table_content + '\n';
             }
           });
 
-          // Вставляем данные
-          block.find('.t431__data-part2').html(tableHTML);
+          // Вставляем данные в текстовый формат Tilda
+          block.find('.t431__data-part2').text(tableText);
           
           if (offset) {
-            block.find('.t431__data-part1').html('');
+            block.find('.t431__data-part1').text('');
           } else {
             block.find('.t431__table tbody').empty();
           }

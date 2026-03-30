@@ -17,18 +17,15 @@ function formatDate(dateString) {
 }
 
 /**
- * Генерация HTML строки таблицы для курса
+ * Генерация строки таблицы для курса — формат Tilda T431
+ * Формат: "Название link=URL; Дата; Перейти button=URL"
  */
 function generateCourseTableRow(course) {
   const courseName = course.Название || 'Без названия';
   const courseLink = course.Ссылка || '#';
   const purchaseDate = formatDate(course.purchaseDate);
   
-  return `<tr>
-    <td>${courseName}</td>
-    <td>${purchaseDate}</td>
-    <td><a href="${courseLink}" class="t-btn t-btn_xs" target="_blank">Перейти к курсу</a></td>
-  </tr>`;
+  return `${courseName} link=${courseLink}; ${purchaseDate}; Перейти button=${courseLink}`;
 }
 
 /**
