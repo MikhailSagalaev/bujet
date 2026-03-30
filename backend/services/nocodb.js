@@ -195,10 +195,16 @@ class NocoDBService {
    */
   async updateUserBonuses(userId, bonusAmount) {
     try {
+      if (!userId) {
+        console.error('updateUserBonuses: userId is empty, skipping');
+        return;
+      }
       // Сначала получаем текущие бонусы
       const user = await this.getUserById(userId);
       const currentBonuses = user.Бонусы || 0;
       const newBonuses = currentBonuses + bonusAmount;
+
+      console.log(`Updating bonuses for user ${userId}: ${currentBonuses} + ${bonusAmount} = ${newBonuses}`);
 
       const response = await axios.patch(
         `${this.baseURL}/${config.nocodb.tables.users}/${userId}`,

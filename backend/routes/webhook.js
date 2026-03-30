@@ -46,6 +46,7 @@ router.post('/tilda', async (req, res) => {
 
     // Получаем или создаём пользователя
     let user = await nocodbService.getUserByEmail(Email);
+    console.log('User found:', user ? `ID=${user.Id || user.ID}, Email=${user.Email}` : 'NOT FOUND');
     
     if (!user) {
       // Создаём нового пользователя
@@ -64,7 +65,7 @@ router.post('/tilda', async (req, res) => {
       }
 
       user = await nocodbService.createUser(newUserData);
-      console.log('New user created:', user.ID);
+      console.log('New user created:', user.Id);
 
       // Обновляем счётчик рефералов у реферала
       if (utm_source) {
@@ -80,17 +81,17 @@ router.post('/tilda', async (req, res) => {
         Email: Email,
         order_id: order_id.toString(),
         Оплата: 'Да',
-        Покупатель: user.ID,
+        Покупатель: user.Id,
         'ID курса': course_id,
         'Бонусы начислить': bonusAmount
       };
 
       await nocodbService.createPurchase(purchaseData);
-      console.log('Purchase created for user:', user.ID);
+      console.log('Purchase created for user:', user.Id);
 
       // Начисляем бонусы покупателю
-      await nocodbService.updateUserBonuses(user.ID, bonusAmount);
-      console.log(`Bonuses added to user ${user.ID}: ${bonusAmount}`);
+      await nocodbService.updateUserBonuses(user.Id, bonusAmount);
+      console.log(`Bonuses added to user ${user.Id}: ${bonusAmount}`);
 
       // Если есть реферал - начисляем бонусы рефералу
       if (user['Кто привёл']) {
@@ -106,7 +107,7 @@ router.post('/tilda', async (req, res) => {
     res.json({
       success: true,
       message: 'Webhook processed successfully',
-      user_id: user.ID
+      user_id: user.Id
     });
 
   } catch (error) {
