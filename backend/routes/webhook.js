@@ -20,15 +20,12 @@ router.post('/tilda', async (req, res) => {
     const {
       Email,
       Name,
-      order_id,
-      payment,
       course_id,
-      amount,
-      utm_source
+      utm_source,
+      payment: paymentData
     } = req.body;
 
     // Если нет Email - это тестовый запрос от Tilda при подключении webhook
-    // Просто отвечаем "ok" как требует документация Tilda
     if (!Email) {
       console.log('Test request from Tilda - responding with "ok"');
       return res.send('ok');
@@ -41,6 +38,11 @@ router.post('/tilda', async (req, res) => {
         message: 'Invalid email'
       });
     }
+
+    // Tilda передаёт payment как объект {sys, orderid, amount, products}
+    const order_id = paymentData?.orderid || req.body.order_id;
+    const amount = paymentData?.amount || req.body.amount;
+    const isPaid = !!(paymentData?.orderid); // если есть orderid — оплата прошла
 
     // Получаем или создаём пользователя
     let user = await nocodbService.getUserByEmail(Email);
@@ -71,8 +73,7 @@ router.post('/tilda', async (req, res) => {
     }
 
     // Если это покупка
-    if (order_id && payment === 'Да' && course_id) {
-      // Создаём покупку
+    if (order_id && isPaid && course_id) {
       const bonusAmount = helpers.calculatePurchaseBonuses(amount, config);
       
       const purchaseData = {
