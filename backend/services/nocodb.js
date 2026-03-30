@@ -78,20 +78,21 @@ class NocoDBService {
 
       const purchases = purchasesResponse.data.list || [];
       
-      // Получаем информацию о курсах
+      // Получаем информацию о курсах через Courses_id
       const coursesPromises = purchases.map(async (purchase) => {
-        if (purchase['ID курса']) {
+        const courseId = purchase['Courses_id'] || purchase['ID курса'];
+        if (courseId) {
           try {
             const courseResponse = await axios.get(
-              `${this.baseURL}/${config.nocodb.tables.courses}/${purchase['ID курса']}`,
+              `${this.baseURL}/${config.nocodb.tables.courses}/${courseId}`,
               { headers: this.headers }
             );
             return {
               ...courseResponse.data,
-              purchaseDate: purchase.Created
+              purchaseDate: purchase.CreatedAt || purchase.Created
             };
           } catch (error) {
-            console.error('Error fetching course:', error.message);
+            console.error('Error fetching course:', courseId, error.message);
             return null;
           }
         }
