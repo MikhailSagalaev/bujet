@@ -46,7 +46,11 @@ router.post('/tilda', async (req, res) => {
     // Tilda передаёт payment как объект {sys, orderid, amount, products}
     const order_id = paymentData?.orderid || req.body.order_id;
     const amount = paymentData?.amount || req.body.amount;
-    const isPaid = !!(paymentData?.orderid); // если есть orderid — оплата прошла
+    const isPaid = !!(paymentData?.orderid);
+    // banktransfer = оплата по счёту, деньги ещё не пришли
+    const isBankTransfer = paymentData?.sys === 'banktransfer';
+    const paymentStatus = isBankTransfer ? 'Ожидает' : 'Да';
+    console.log(`Payment: order_id=${order_id}, sys=${paymentData?.sys}, status=${paymentStatus}`);
 
     // Получаем или создаём пользователя
     let user = await nocodbService.getUserByEmail(Email);
@@ -79,51 +83,63 @@ router.post('/tilda', async (req, res) => {
 
     // Если это покупка подписки
     if (order_id && isPaid && (subscription || podpiska)) {
-      const renewalDate = new Date();
-      renewalDate.setMonth(renewalDate.getMonth() + 1);
-      const renewalStr = renewalDate.toISOString().split('T')[0];
-
-      await nocodbService.updateUser(user.Id, {
-        'Тариф': '🏆Про',
-        'Дата продления': renewalStr
-      });
-      console.log(`Subscription activated for user ${user.Id} until ${renewalStr}`);
-
       const bonusAmount = helpers.calculatePurchaseBonuses(amount, config);
-      await nocodbService.updateUserBonuses(user.Id, bonusAmount);
+
+      if (!isBankTransfer) {
+        // Карта — активируем сразу
+        const renewalDate = new Date();
+        renewalDate.setMonth(renewalDate.getMonth() + 1);
+        const renewalStr = renewalDate.toISOString().split('T')[0];
+        await nocodbService.updateUser(user.Id, {
+          'Тариф': '🏆Про',
+          'Дата продления': renewalStr
+        });
+        await nocodbService.updateUserBonuses(user.Id, bonusAmount);
+        console.log(`Subscription activated for user ${user.Id} until ${renewalStr}`);
+      } else {
+        // По счёту — только создаём запись, доступ не открываем
+        console.log(`Subscription pending payment for user ${user.Id}`);
+      }
+
+      // Сохраняем запись о заказе подписки
+      await nocodbService.createPurchase({
+        Email: Email,
+        order_id: order_id.toString(),
+        Оплата: paymentStatus,
+        Users_id: user.Id,
+        'Бонусы начислить': isBankTransfer ? 0 : bonusAmount,
+        'Название курса': 'Подписка Про'
+      });
     }
 
     // Если это покупка курса
     if (order_id && isPaid && course_id) {
-      const bonusAmount = helpers.calculatePurchaseBonuses(amount, config);
+      const bonusAmount = isBankTransfer ? 0 : helpers.calculatePurchaseBonuses(amount, config);
       
       const purchaseData = {
         Email: Email,
         order_id: order_id.toString(),
-        Оплата: 'Да',
+        Оплата: paymentStatus,
         Users_id: user.Id,
         Courses_id: parseInt(course_id),
         'Бонусы начислить': bonusAmount
       };
 
       await nocodbService.createPurchase(purchaseData);
-      console.log('Purchase created for user:', user.Id);
+      console.log(`Purchase created for user ${user.Id}, status: ${paymentStatus}`);
 
-      // Начисляем бонусы покупателю
-      await nocodbService.updateUserBonuses(user.Id, bonusAmount);
-      console.log(`Bonuses added to user ${user.Id}: ${bonusAmount}`);
+      // Бонусы и рефералы только если оплата подтверждена
+      if (!isBankTransfer) {
+        await nocodbService.updateUserBonuses(user.Id, bonusAmount);
+        console.log(`Bonuses added to user ${user.Id}: ${bonusAmount}`);
 
-      // Если есть реферал - начисляем бонусы рефералу
-      if (user['Кто привёл']) {
-        const referralBonus = config.bonuses.referral;
-        // Находим реферала по его реферальному коду/ID
-        const referrer = await nocodbService.getUserById(user['Кто привёл']);
-        if (referrer && referrer.Id) {
-          await nocodbService.updateUserBonuses(referrer.Id, referralBonus);
-          console.log(`Referral bonus added to user ${referrer.Id}: ${referralBonus}`);
-          await nocodbService.updateReferralCount(referrer.Id);
-        } else {
-          console.warn('Referrer not found for:', user['Кто привёл']);
+        if (user['Кто привёл']) {
+          const referrer = await nocodbService.getUserById(user['Кто привёл']);
+          if (referrer && referrer.Id) {
+            await nocodbService.updateUserBonuses(referrer.Id, config.bonuses.referral);
+            await nocodbService.updateReferralCount(referrer.Id);
+            console.log(`Referral bonus added to user ${referrer.Id}`);
+          }
         }
       }
     }
