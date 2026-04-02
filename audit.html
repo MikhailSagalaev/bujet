@@ -340,9 +340,14 @@
 
 .eb-btn--next {
   display: none;
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
 }
 
-.eb-btn--next.show { display: inline-flex; }
+.eb-btn--next.show {
+  display: inline-flex;
+}
 
 /* Результат */
 .eb-result { display: none; }
@@ -623,10 +628,7 @@
 </section>
 
 <script>
-(function() {
 var Q = [
-  {
-    cat: 'Нормативная база — раздел 1 учётной политики',
     section: 'Раздел «Нормативная база» / «Правовые основания ведения учёта»',
     text: 'Найдите в своей учётной политике перечень нормативных актов. Какие документы там перечислены?',
     opts: [
@@ -897,7 +899,6 @@ function restart() {
 }
 
 render();
-})();
 </script>
 </body>
 </html>
