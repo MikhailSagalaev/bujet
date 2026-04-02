@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мини-гайд: точечная проверка формулировок — e-budget.ru</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, Helvetica, sans-serif; background: #f4f6f8; color: #1a1f2e; }
+.page { max-width: 800px; margin: 0 auto; padding: 40px 20px 60px; }
+.header__logo { font-size: 13px; font-weight: 700; color: #00a888; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+.header__title { font-size: 30px; font-weight: 700; line-height: 1.2; margin-bottom: 10px; }
+.header__sub { font-size: 16px; color: #64748b; line-height: 1.6; margin-bottom: 32px; }
+
+.intro-card { background: linear-gradient(135deg, #00C9A7, #0ea5e9); border-radius: 16px; padding: 24px 28px; margin-bottom: 28px; color: #fff; }
+.intro-card h2 { font-size: 18px; margin-bottom: 8px; }
+.intro-card p { font-size: 14px; line-height: 1.6; opacity: .9; }
+
+/* Сравнение было/стало */
+.compare-block { background: #fff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 28px 32px; margin-bottom: 20px; }
+.compare-block__title { font-size: 18px; font-weight: 700; color: #1a1f2e; margin-bottom: 6px; }
+.compare-block__norm { font-size: 13px; color: #94a3b8; margin-bottom: 20px; }
+
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+
+.compare-box { border-radius: 10px; padding: 16px; }
+.compare-box--bad { background: #fff5f5; border: 1px solid #fca5a5; }
+.compare-box--good { background: #f0fefa; border: 1px solid #6ee7b7; }
+
+.compare-box__label { font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; margin-bottom: 8px; }
+.compare-box--bad .compare-box__label { color: #dc2626; }
+.compare-box--good .compare-box__label { color: #00a888; }
+
+.compare-box__text { font-size: 14px; line-height: 1.6; color: #334155; font-style: italic; }
+
+.compare-block__why { font-size: 14px; line-height: 1.55; color: #64748b; padding: 12px 16px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #0ea5e9; }
+.compare-block__why strong { color: #0ea5e9; }
+
+/* Алгоритм проверки */
+.algo-section { background: #fff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 28px 32px; margin-bottom: 20px; }
+.algo-section__title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+.algo-steps { display: flex; flex-direction: column; gap: 14px; }
+.algo-step { display: flex; gap: 14px; }
+.algo-step__num { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #00C9A7, #0ea5e9); color: #fff; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.algo-step__body { flex: 1; }
+.algo-step__title { font-size: 15px; font-weight: 700; color: #1a1f2e; margin-bottom: 4px; }
+.algo-step__text { font-size: 14px; color: #64748b; line-height: 1.55; }
+
+/* Стоп-слова */
+.stopwords { background: #fff; border-radius: 16px; border: 1px solid #fca5a5; padding: 24px 28px; margin-bottom: 20px; }
+.stopwords__title { font-size: 18px; font-weight: 700; color: #dc2626; margin-bottom: 6px; }
+.stopwords__sub { font-size: 14px; color: #64748b; margin-bottom: 16px; }
+.sw-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.sw-item { background: #fff5f5; border: 1px solid #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #991b1b; }
+.sw-item__fix { font-size: 12px; color: #64748b; margin-top: 4px; }
+
+.cta { background: linear-gradient(135deg, #00C9A7, #0ea5e9); border-radius: 16px; padding: 28px 32px; }
+.cta__title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.cta__sub { font-size: 15px; color: rgba(255,255,255,.85); margin-bottom: 20px; line-height: 1.5; }
+.cta__btn { display: inline-block; background: #fff; color: #1a1f2e; text-decoration: none; font-size: 15px; font-weight: 700; padding: 13px 26px; border-radius: 10px; }
+
+@media (max-width: 600px) {
+  .compare-grid { grid-template-columns: 1fr; }
+  .sw-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header__logo">E-BUDGET.RU · РАБОЧАЯ БАЗА 2026</div>
+    <h1 class="header__title">Мини-гайд: точечная проверка формулировок учётной политики</h1>
+    <p class="header__sub">Для тех, у кого база в целом готова — осталось проверить что конкретные формулировки соответствуют новым ФСБУ и выдержат контрольную проверку.</p>
+  </div>
+
+  <div class="intro-card">
+    <h2>Зачем это нужно, если документы уже обновлены?</h2>
+    <p>Большинство учреждений обновили учётную политику формально: изменили дату, добавили упоминание новых ФСБУ, но не заменили конкретные формулировки. Именно это становится причиной замечаний. Этот гайд — про конкретные слова и фразы.</p>
+  </div>
+
+  <!-- Пример 1 -->
+  <div class="compare-block">
+    <div class="compare-block__title">1. Амортизация основных средств</div>
+    <div class="compare-block__norm">ФСБУ «Основные средства» (257н, 259н)</div>
+    <div class="compare-grid">
+      <div class="compare-box compare-box--bad">
+        <div class="compare-box__label">❌ Было (принято до 2023)</div>
+        <div class="compare-box__text">«Амортизация начисляется линейным методом в соответствии с действующим законодательством»</div>
+      </div>
+      <div class="compare-box compare-box--good">
+        <div class="compare-box__label">✅ Должно быть</div>
+        <div class="compare-box__text">«Амортизация объектов ОС начисляется линейным методом исходя из срока полезного использования, определённого согласно Постановлению Правительства РФ № 1 и ФСБУ 257н»</div>
+      </div>
+    </div>
+    <div class="compare-block__why"><strong>Почему важно:</strong> фраза «в соответствии с действующим законодательством» без конкретики не защищает при проверке — проверяющий вправе трактовать её по-своему.</div>
+  </div>
+
+  <!-- Пример 2 -->
+  <div class="compare-block">
+    <div class="compare-block__title">2. Критерии признания активов</div>
+    <div class="compare-block__norm">ФСБУ «Концептуальные основы» (256н)</div>
+    <div class="compare-grid">
+      <div class="compare-box compare-box--bad">
+        <div class="compare-box__label">❌ Было</div>
+        <div class="compare-box__text">«Активы принимаются к учёту при соответствии критериям признания, установленным законодательством»</div>
+      </div>
+      <div class="compare-box compare-box--good">
+        <div class="compare-box__label">✅ Должно быть</div>
+        <div class="compare-box__text">«Объект признаётся активом при одновременном выполнении условий: принадлежность учреждению, ожидаемые экономические выгоды или полезный потенциал, стоимость поддаётся надёжной оценке (ФСБУ 256н, п. 35–36)»</div>
+      </div>
+    </div>
+    <div class="compare-block__why"><strong>Почему важно:</strong> без перечисления условий признания из 256н учётная политика не соответствует стандарту формально.</div>
+  </div>
+
+  <!-- Пример 3 -->
+  <div class="compare-block">
+    <div class="compare-block__title">3. Существенность ошибок</div>
+    <div class="compare-block__norm">ФСБУ «Учётная политика» (274н)</div>
+    <div class="compare-grid">
+      <div class="compare-box compare-box--bad">
+        <div class="compare-box__label">❌ Было</div>
+        <div class="compare-box__text">«Существенные ошибки исправляются в порядке, установленном Инструкцией 157н»</div>
+      </div>
+      <div class="compare-box compare-box--good">
+        <div class="compare-box__label">✅ Должно быть</div>
+        <div class="compare-box__text">«Ошибка считается существенной, если её исправление влияет на экономические решения пользователей отчётности. Критерий существенности — [сумма] тыс. руб. или [%] от валюты баланса. Исправление существенных ошибок прошлых периодов — ретроспективно (ФСБУ 274н, п. 30–32)»</div>
+      </div>
+    </div>
+    <div class="compare-block__why"><strong>Почему важно:</strong> 274н требует установить количественный критерий существенности. «Существенные» без цифры — не соответствует стандарту.</div>
+  </div>
+
+  <!-- Пример 4 -->
+  <div class="compare-block">
+    <div class="compare-block__title">4. Резервы предстоящих расходов</div>
+    <div class="compare-block__norm">ФСБУ «Резервы» (кассовое исполнение бюджетов)</div>
+    <div class="compare-grid">
+      <div class="compare-box compare-box--bad">
+        <div class="compare-box__label">❌ Было</div>
+        <div class="compare-box__text">«Резервы предстоящих расходов не формируются»</div>
+      </div>
+      <div class="compare-box compare-box--good">
+        <div class="compare-box__label">✅ Должно быть</div>
+        <div class="compare-box__text">«Резервы предстоящих расходов формируются по следующим видам обязательств: [перечень] — в соответствии с ФСБУ «Резервы». При отсутствии оснований для формирования резервов — указать соответствующее основание»</div>
+      </div>
+    </div>
+    <div class="compare-block__why"><strong>Почему важно:</strong> простое «не формируются» без обоснования — некорректно. Нужно либо перечислить резервы, либо обосновать отсутствие оснований.</div>
+  </div>
+
+  <!-- Алгоритм проверки -->
+  <div class="algo-section">
+    <div class="algo-section__title">Алгоритм точечной проверки формулировок</div>
+    <div class="algo-steps">
+      <div class="algo-step">
+        <div class="algo-step__num">1</div>
+        <div class="algo-step__body">
+          <div class="algo-step__title">Открыть ФСБУ рядом с текстом УП</div>
+          <div class="algo-step__text">Для каждого раздела УП — найти соответствующий ФСБУ и сравнить требуемое содержание с фактическим. Ключевые: 256н, 257н, 259н, 274н.</div>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-step__num">2</div>
+        <div class="algo-step__body">
+          <div class="algo-step__title">Искать стоп-слова (список ниже)</div>
+          <div class="algo-step__text">Каждая такая формулировка — потенциальное замечание. Заменить на конкретные параметры.</div>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-step__num">3</div>
+        <div class="algo-step__body">
+          <div class="algo-step__title">Проверить числа и даты</div>
+          <div class="algo-step__text">Пороги существенности, ставки амортизации, сроки — всё должно быть в цифрах, не словах. «Не менее 100 000 руб.» лучше чем «значительная сумма».</div>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-step__num">4</div>
+        <div class="algo-step__body">
+          <div class="algo-step__title">Проверить ссылки на нормативку</div>
+          <div class="algo-step__text">Ссылка на старую редакцию или отменённый приказ — это нарушение. Сверить все ссылки с актуальным перечнем ФСБУ на сайте Минфина.</div>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-step__num">5</div>
+        <div class="algo-step__body">
+          <div class="algo-step__title">Пройти детальный самоаудит</div>
+          <div class="algo-step__text">Используйте инструмент e-budget.ru — он проверяет конкретные формулировки учётной политики по актуальным требованиям 2026 года.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Стоп-слова -->
+  <div class="stopwords">
+    <div class="stopwords__title">🚫 Стоп-слова в учётной политике</div>
+    <div class="stopwords__sub">Если видите эти формулировки — замените на конкретные параметры</div>
+    <div class="sw-grid">
+      <div class="sw-item">«в соответствии с действующим законодательством»<div class="sw-item__fix">→ Указать конкретный ФСБУ и пункт</div></div>
+      <div class="sw-item">«существенные суммы»<div class="sw-item__fix">→ Указать конкретный порог в рублях или %</div></div>
+      <div class="sw-item">«своевременно»<div class="sw-item__fix">→ Указать конкретный срок в рабочих днях</div></div>
+      <div class="sw-item">«при необходимости»<div class="sw-item__fix">→ Указать условия, при которых применяется</div></div>
+      <div class="sw-item">«в общеустановленном порядке»<div class="sw-item__fix">→ Указать конкретный нормативный акт</div></div>
+      <div class="sw-item">«по решению руководителя»<div class="sw-item__fix">→ Указать критерии для принятия решения</div></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <div class="cta__title">Готовы к детальной проверке формулировок?</div>
+    <div class="cta__sub">Детальный самоаудит проверит конкретные разделы вашей учётной политики и покажет какие формулировки требуют замены.</div>
+    <a href="https://e-budget.ru/audit-2026html" class="cta__btn">Пройти детальный самоаудит →</a>
+  </div>
+
+  <p style="margin-top:28px;font-size:13px;color:#94a3b8;text-align:center;">e-budget.ru · 2026 · Методология бухучёта для госучреждений</p>
+</div>
+</body>
+</html>

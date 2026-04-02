@@ -99,7 +99,7 @@ router.post('/submit', async (req, res) => {
               <table cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td style="background-color:#00C9A7;border-radius:8px;text-align:center;">
-                    <a href="https://e-budget.ru/audit-2026.html" style="display:inline-block;padding:15px 30px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;">Перейти к детальному самоаудиту →</a>
+                    <a href="https://e-budget.ru/audit-2026" style="display:inline-block;padding:15px 30px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;">Перейти к детальному самоаудиту →</a>
                   </td>
                 </tr>
               </table>

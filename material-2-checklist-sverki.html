@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Чек-лист сверки документов — e-budget.ru</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, Helvetica, sans-serif; background: #f4f6f8; color: #1a1f2e; }
+.page { max-width: 800px; margin: 0 auto; padding: 40px 20px 60px; }
+.header__logo { font-size: 13px; font-weight: 700; color: #00a888; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+.header__title { font-size: 30px; font-weight: 700; line-height: 1.2; color: #1a1f2e; margin-bottom: 10px; }
+.header__sub { font-size: 16px; color: #64748b; line-height: 1.6; margin-bottom: 32px; }
+
+.tabs { display: flex; gap: 4px; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 4px; margin-bottom: 24px; }
+.tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; color: #64748b; border: none; background: none; transition: all .2s; }
+.tab.active { background: linear-gradient(90deg, #00C9A7, #0ea5e9); color: #fff; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.check-group { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 16px; overflow: hidden; }
+.check-group__head { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; }
+.check-group__icon { font-size: 18px; }
+.check-group__title { font-size: 16px; font-weight: 700; color: #1a1f2e; }
+.check-group__body { padding: 12px 20px; display: flex; flex-direction: column; gap: 10px; }
+
+.chk { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-radius: 10px; background: #fafbfc; border: 1px solid #f1f5f9; cursor: pointer; transition: background .15s; }
+.chk:hover { background: #f0fefa; border-color: #6ee7b7; }
+.chk.checked { background: #f0fefa; border-color: #6ee7b7; }
+
+.chk__box { width: 20px; height: 20px; border: 2px solid #cbd5e1; border-radius: 5px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+.chk.checked .chk__box { background: #00C9A7; border-color: #00C9A7; }
+.chk.checked .chk__box::after { content: "✓"; color: #fff; font-size: 12px; font-weight: 800; }
+
+.chk__text { font-size: 14px; color: #334155; line-height: 1.5; }
+.chk__warn { display: none; font-size: 12px; color: #d97706; margin-top: 4px; padding: 6px 10px; background: #fffbeb; border-radius: 6px; }
+.chk__warn.show { display: block; }
+
+.alert { padding: 14px 18px; border-radius: 10px; font-size: 14px; line-height: 1.55; margin: 0 0 14px; }
+.alert--red { background: #fff5f5; border: 1px solid #fca5a5; color: #991b1b; }
+.alert--amber { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; }
+
+.progress-wrap { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 20px 24px; margin: 20px 0; }
+.progress-wrap__top { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+.pb { height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+.pb__fill { height: 100%; background: linear-gradient(90deg, #00C9A7, #0ea5e9); border-radius: 999px; width: 0%; transition: width .4s; }
+
+.cta { background: linear-gradient(135deg, #00C9A7, #0ea5e9); border-radius: 16px; padding: 28px 32px; }
+.cta__title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.cta__sub { font-size: 15px; color: rgba(255,255,255,.85); margin-bottom: 20px; line-height: 1.5; }
+.cta__btn { display: inline-block; background: #fff; color: #1a1f2e; text-decoration: none; font-size: 15px; font-weight: 700; padding: 13px 26px; border-radius: 10px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header__logo">E-BUDGET.RU · ЧАСТИЧНАЯ ГОТОВНОСТЬ 2026</div>
+    <h1 class="header__title">Чек-лист сверки: учётная политика, график документооборота, внутренний контроль</h1>
+    <p class="header__sub">Три взаимосвязанных документа — замечания чаще всего возникают в местах их несогласованности между собой.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="up">Учётная политика</button>
+    <button class="tab" data-tab="gd">График докум.</button>
+    <button class="tab" data-tab="vk">Внутренний контроль</button>
+    <button class="tab" data-tab="svk">Сверка связей</button>
+  </div>
+
+  <!-- Панель 1: Учётная политика -->
+  <div class="panel active" id="tab-up">
+    <div class="alert alert--amber">Ключевой вопрос: соответствуют ли формулировки УП актуальным стандартам, или обновления были формальными — добавили дату без изменения содержания?</div>
+
+    <div class="check-group">
+      <div class="check-group__head"><span class="check-group__icon">📋</span><span class="check-group__title">Структура и актуальность</span></div>
+      <div class="check-group__body">
+        <div class="chk" data-warn="Без ссылки на 256н документ может быть признан несоответствующим текущим требованиям">
+          <div class="chk__box"></div>
+          <div class="chk__text">УП содержит ссылки на ФСБУ «Концептуальные основы» (256н) и «Учётная политика» (274н)<div class="chk__warn"></div></div>
+        </div>
+        <div class="chk" data-warn="Формулировка без конкретных параметров не защищает при проверке">
+          <div class="chk__box"></div>
+          <div class="chk__text">Метод начисления амортизации прямо указан — не «согласно законодательству», а конкретный метод<div class="chk__warn"></div></div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Критерии признания ОС / НМА / МЗ содержат пороговые суммы в рублях</div>
+        </div>
+        <div class="chk" data-warn="Отдельная страница УП или приложение — оба варианта допустимы, главное чтобы было">
+          <div class="chk__box"></div>
+          <div class="chk__text">Раздел о событиях после отчётной даты присутствует<div class="chk__warn"></div></div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Порядок исправления ошибок соответствует ФСБУ 274н (существенные / несущественные)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group__head"><span class="check-group__icon">📎</span><span class="check-group__title">Приложения к УП</span></div>
+      <div class="check-group__body">
+        <div class="chk" data-warn="Применение устаревших форм — типичное нарушение при проверке">
+          <div class="chk__box"></div>
+          <div class="chk__text">Формы первичных документов в приложении актуальны (не ниже приказа 61н редакция 2023+)<div class="chk__warn"></div></div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Рабочий план счетов соответствует Инструкции 157н / 162н / 174н / 183н для вашего типа учреждения</div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Приложения пронумерованы и перечислены в тексте УП</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Панель 2: График документооборота -->
+  <div class="panel" id="tab-gd">
+    <div class="alert alert--amber">Частая ситуация: УП обновили, а график документооборота остался с именами старых сотрудников и старыми формами.</div>
+
+    <div class="check-group">
+      <div class="check-group__head"><span class="check-group__icon">👤</span><span class="check-group__title">Ответственные лица</span></div>
+      <div class="check-group__body">
+        <div class="chk" data-warn="Если указаны имена уволенных сотрудников — это нарушение, которое выявляется немедленно">
+          <div class="chk__box"></div>
+          <div class="chk__text">Все ответственные в графике — действующие сотрудники<div class="chk__warn"></div></div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Для каждой должности указан порядок замещения при отсутствии</div>
+        </div>
+        <div class="chk" data-warn="Без подписи руководителя в графике — нарушение порядка оформления">
+          <div class="chk__box"></div>
+          <div class="chk__text">График утверждён подписью руководителя с актуальной датой<div class="chk__warn"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group__head"><span class="check-group__icon">📄</span><span class="check-group__title">Документы и формы</span></div>
+      <div class="check-group__body">
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Формы документов в графике совпадают с приложениями к учётной политике</div>
+        </div>
+        <div class="chk" data-warn="Если учреждение получает или отправляет электронные документы — они должны быть в графике">
+          <div class="chk__box"></div>
+          <div class="chk__text">Электронные документы и порядок их подписания (ЭЦП) отражены в графике<div class="chk__warn"></div></div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Сроки передачи документов указаны в рабочих днях, не «своевременно»</div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Сроки хранения актуализированы под приказ Росархива № 236</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Панель 3: Внутренний контроль -->
+  <div class="panel" id="tab-vk">
+    <div class="alert alert--red">Внутренний контроль — зона наибольших рисков для учреждений в «частичной готовности». Именно здесь чаще всего возникают замечания органов ФК.</div>
+
+    <div class="check-group">
+      <div class="check-group__head"><span class="check-group__icon">🔍</span><span class="check-group__title">Документация ВК</span></div>
+      <div class="check-group__body">
+        <div class="chk" data-warn="Без карты рисков положение о ВК может быть признано формальным документом">
+          <div class="chk__box"></div>
+          <div class="chk__text">Карта рисков или реестр контрольных процедур составлены и актуализированы<div class="chk__warn"></div></div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Разграничены предварительный, текущий и последующий контроль с указанием ответственных</div>
+        </div>
+        <div class="chk" data-warn="Без журнала — невозможно подтвердить, что контроль реально осуществляется">
+          <div class="chk__box"></div>
+          <div class="chk__text">Ведётся журнал или иной регистр контрольных мероприятий<div class="chk__warn"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group__head"><span class="check-group__icon">⚙️</span><span class="check-group__title">Практика ВК</span></div>
+      <div class="check-group__body">
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Контрольные процедуры по расчётам с подотчётными лицами выполняются регулярно</div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Инвентаризация активов и обязательств проводится в установленные сроки</div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Контроль закупочной документации включён в процедуры ВК</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Панель 4: Сверка связей -->
+  <div class="panel" id="tab-svk">
+    <div class="alert alert--amber">Самая частая причина замечаний: три документа обновлялись независимо и теперь противоречат друг другу.</div>
+
+    <div class="check-group">
+      <div class="check-group__head"><span class="check-group__icon">🔗</span><span class="check-group__title">УП ↔ График документооборота</span></div>
+      <div class="check-group__body">
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Формы документов в УП (Приложение) = формам в графике документооборота</div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Ответственные за первичные документы в графике = должностям, указанным в УП</div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Рабочий план счетов в УП используется в первичных документах графика</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group__head"><span class="check-group__icon">🔗</span><span class="check-group__title">УП ↔ Внутренний контроль</span></div>
+      <div class="check-group__body">
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Порог существенности в УП совпадает с порогом существенности в положении о ВК</div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Контрольные процедуры ВК охватывают все операции, упомянутые в УП как «существенные»</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group__head"><span class="check-group__icon">🔗</span><span class="check-group__title">График ↔ Внутренний контроль</span></div>
+      <div class="check-group__body">
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Сроки контрольных мероприятий в положении о ВК согласованы со сроками в графике документооборота</div>
+        </div>
+        <div class="chk">
+          <div class="chk__box"></div>
+          <div class="chk__text">Ответственные за контроль в положении о ВК = ответственным за передачу документов в графике</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Прогресс -->
+  <div class="progress-wrap">
+    <div class="progress-wrap__top">
+      <span>Общий прогресс проверки</span>
+      <span id="progText" style="color:#00a888;">0 из 24</span>
+    </div>
+    <div class="pb"><div class="pb__fill" id="progFill"></div></div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <div class="cta__title">Нашли расхождения между документами?</div>
+    <div class="cta__sub">Детальный самоаудит проверит точные формулировки учётной политики и укажет где именно нужна правка.</div>
+    <a href="https://e-budget.ru/audit-2026html" class="cta__btn">Перейти к детальному самоаудиту →</a>
+  </div>
+
+  <p style="margin-top:28px;font-size:13px;color:#94a3b8;text-align:center;">e-budget.ru · 2026</p>
+</div>
+
+<script>
+// Tabs
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// Checkboxes
+const allChks = document.querySelectorAll('.chk');
+const progFill = document.getElementById('progFill');
+const progText = document.getElementById('progText');
+const total = allChks.length;
+
+allChks.forEach(chk => {
+  chk.addEventListener('click', () => {
+    chk.classList.toggle('checked');
+    const warn = chk.querySelector('.chk__warn');
+    if (warn) {
+      warn.textContent = chk.dataset.warn || '';
+      warn.classList.toggle('show', !chk.classList.contains('checked') && !!chk.dataset.warn);
+    }
+    const done = document.querySelectorAll('.chk.checked').length;
+    progFill.style.width = Math.round(done/total*100) + '%';
+    progText.textContent = done + ' из ' + total;
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Аудит учётной политики 2026 — e-Budget</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #0f2744;
+  --blue:   #1a3f6f;
+  --mid:    #2563a8;
+  --gold:   #e8a020;
+  --gl:     #f5c842;
+  --red:    #b91c1c;
+  --rl:     #fef2f2;
+  --green:  #166534;
+  --grl:    #f0fdf4;
+  --amber:  #92400e;
+  --al:     #fffbeb;
+  --white:  #ffffff;
+  --off:    #f5f8fc;
+  --border: #dce6f0;
+  --text:   #1a2535;
+  --muted:  #5a6a80;
+  --mono:   'Courier New', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Source Sans 3',sans-serif;background:var(--off);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+.hdr{background:var(--navy);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.3)}
+.logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff}.logo span{color:var(--gold)}
+.badge{background:var(--gold);color:var(--navy);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,#1a3f6f 65%,#1e4d8c 100%);padding:48px 24px 68px;text-align:center;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:-40px;left:-40px;width:200px;height:200px;border-radius:50%;background:rgba(37,99,168,.12);pointer-events:none}
+.chip{display:inline-block;background:rgba(232,160,32,.18);border:1px solid rgba(232,160,32,.4);color:var(--gl);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 18px;border-radius:20px;margin-bottom:18px}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(22px,5vw,38px);font-weight:900;color:#fff;line-height:1.25;margin-bottom:14px;position:relative;z-index:1}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero-sub{color:rgba(255,255,255,.72);font-size:15px;line-height:1.65;max-width:580px;margin:0 auto 24px;z-index:1;position:relative}
+.hero-instruction{display:inline-flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px 20px;max-width:520px;text-align:left;position:relative;z-index:1}
+.hero-instruction .icon{font-size:22px;line-height:1;margin-top:2px}
+.hero-instruction p{font-size:13px;color:rgba(255,255,255,.85);line-height:1.55}
+.hero-instruction strong{color:var(--gl)}
+
+/* WRAPPER */
+.wrap{max-width:740px;margin:-28px auto 0;padding:0 16px 60px;position:relative;z-index:10}
+
+/* PROGRESS */
+.prog-card{background:#fff;border-radius:14px 14px 0 0;padding:18px 26px 14px;border-bottom:1px solid var(--border);box-shadow:0 -4px 20px rgba(0,0,0,.06)}
+.prog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.prog-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.prog-counter{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--navy)}
+.prog-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--mid),var(--gold));border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* QUESTION CARD */
+.q-card{background:#fff;border-radius:0 0 14px 14px;padding:26px 26px 30px;box-shadow:0 8px 28px rgba(15,39,68,.1);animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.q-cat{font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--mid);margin-bottom:8px}
+.q-num{font-size:12px;color:var(--muted);margin-bottom:4px}
+
+/* INSTRUCTION BLOCK */
+.q-instruction{margin-bottom:18px}
+.q-instruction .step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.step-num{width:24px;height:24px;min-width:24px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.step-text{font-size:14px;line-height:1.55;color:var(--text)}
+.step-text strong{color:var(--navy)}
+
+/* SECTION FINDER */
+.section-box{background:var(--off);border:1px solid var(--border);border-left:3px solid var(--mid);border-radius:0 8px 8px 0;padding:12px 16px;margin:14px 0 18px;font-size:13px;color:var(--text);line-height:1.6}
+.section-box .section-label{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mid);margin-bottom:5px}
+.section-box .section-name{font-family:var(--mono);font-size:13px;color:var(--navy);font-weight:700}
+
+/* CHECK TEXT */
+.check-label{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+.check-text{font-size:15px;font-weight:700;font-family:'Playfair Display',serif;color:var(--navy);line-height:1.4;margin-bottom:20px}
+
+/* OPTIONS */
+.options{display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:2px solid var(--border);border-radius:11px;cursor:pointer;transition:all .18s ease;background:#fff;text-align:left;width:100%}
+.opt:hover:not(:disabled){border-color:var(--mid);transform:translateX(3px);box-shadow:0 3px 12px rgba(37,99,168,.1)}
+.opt-dot{width:20px;height:20px;min-width:20px;border-radius:50%;border:2px solid var(--border);margin-top:2px;transition:all .18s;background:#fff}
+.opt-body{flex:1}
+.opt-main{font-size:14px;font-weight:600;color:var(--text);line-height:1.4}
+.opt-hint{font-size:12px;color:var(--muted);margin-top:2px;font-style:italic}
+
+.opt.ans-yes .opt-dot{background:var(--green);border-color:var(--green)}
+.opt.ans-yes{border-color:var(--green);background:var(--grl)}
+.opt.ans-partly .opt-dot{background:var(--amber);border-color:var(--amber)}
+.opt.ans-partly{border-color:var(--amber);background:var(--al)}
+.opt.ans-no .opt-dot{background:var(--red);border-color:var(--red)}
+.opt.ans-no{border-color:var(--red);background:var(--rl)}
+.opt:disabled{cursor:default;transform:none}
+
+/* FEEDBACK */
+.feedback{display:none;margin-top:18px;border-radius:11px;padding:16px 18px;animation:fadeUp .3s ease;border-left:4px solid}
+.feedback.show{display:block}
+.feedback.fb-yes{background:var(--grl);border-color:var(--green)}
+.feedback.fb-partly{background:var(--al);border-color:#d97706}
+.feedback.fb-no{background:var(--rl);border-color:var(--red)}
+.fb-head{font-size:13px;font-weight:700;margin-bottom:8px}
+.feedback.fb-yes .fb-head{color:var(--green)}
+.feedback.fb-partly .fb-head{color:var(--amber)}
+.feedback.fb-no .fb-head{color:var(--red)}
+.fb-body{font-size:13px;line-height:1.65;color:var(--text)}
+.fb-body strong{color:var(--navy)}
+
+/* WHAT CORRECT looks like */
+.correct-sample{margin-top:12px;background:rgba(15,39,68,.04);border:1px dashed var(--border);border-radius:8px;padding:12px 14px}
+.correct-sample-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.correct-sample-text{font-family:var(--mono);font-size:12px;color:var(--navy);line-height:1.6}
+
+.norm-tag{display:inline-block;margin-top:10px;font-size:11px;color:var(--mid);background:rgba(37,99,168,.07);padding:3px 10px;border-radius:5px;font-weight:600}
+
+/* NEXT BUTTON */
+.next-btn{display:none;margin-top:18px;width:100%;padding:15px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:11px;font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(15,39,68,.2)}
+.next-btn.show{display:block}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 7px 20px rgba(15,39,68,.28)}
+
+/* RESULT */
+.result{background:#fff;border-radius:14px;box-shadow:0 8px 28px rgba(15,39,68,.1);overflow:hidden;display:none;animation:fadeUp .5s ease}
+.result.show{display:block}
+
+.res-header{padding:32px 26px 24px;text-align:center}
+.res-score-wrap{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:20px;flex-wrap:wrap}
+.score-block{text-align:center}
+.score-big{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;line-height:1}
+.score-label{font-size:12px;color:var(--muted);margin-top:4px}
+.score-sep{font-size:24px;color:var(--border)}
+
+.res-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.res-sub{font-size:14px;color:var(--muted);line-height:1.55;max-width:500px;margin:0 auto}
+
+/* ISSUES LIST */
+.issues{padding:0 26px 24px}
+.issues-title{font-size:11px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.issue-item{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--off)}
+.issue-icon{width:28px;height:28px;min-width:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;margin-top:1px}
+.ii-ok{background:#dcfce7;color:var(--green)}
+.ii-warn{background:#fef3c7;color:var(--amber)}
+.ii-bad{background:#fee2e2;color:var(--red)}
+.issue-content{flex:1}
+.issue-topic{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.issue-desc{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* CTA */
+.cta{margin:0 26px 26px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:13px;padding:22px;text-align:center}
+.cta h3{font-family:'Playfair Display',serif;font-size:19px;color:#fff;margin-bottom:7px}
+.cta p{font-size:13px;color:rgba(255,255,255,.72);margin-bottom:18px;line-height:1.5}
+.cta-btns{display:flex;flex-direction:column;gap:9px}
+.cta-a{padding:14px 20px;background:var(--gold);color:var(--navy);border:none;border-radius:9px;font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:block;transition:all .2s}
+.cta-a:hover{background:var(--gl);transform:translateY(-2px)}
+.cta-b{padding:12px 20px;background:rgba(255,255,255,.09);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:9px;font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;text-decoration:none;display:block;transition:all .2s}
+.cta-b:hover{background:rgba(255,255,255,.15)}
+
+.restart{display:block;margin:0 26px 26px;padding:12px;background:var(--off);border:1px solid var(--border);border-radius:9px;font-family:'Source Sans 3',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;text-align:center;transition:all .2s;width:calc(100% - 52px)}
+.restart:hover{background:var(--border);color:var(--text)}
+
+.footer{text-align:center;font-size:12px;color:var(--muted);margin-top:22px;line-height:1.6}
+.footer a{color:var(--mid);text-decoration:none}
+
+/* LEVEL COLORS */
+.level-red .res-header{background:linear-gradient(160deg,#fff0f0,#fff)}
+.level-red .score-big{color:var(--red)}
+.level-amber .res-header{background:linear-gradient(160deg,#fffbeb,#fff)}
+.level-amber .score-big{color:#b45309}
+.level-green .res-header{background:linear-gradient(160deg,#f0fdf4,#fff)}
+.level-green .score-big{color:var(--green)}
+
+@media(max-width:480px){
+  .hero{padding:34px 14px 58px}
+  .prog-card,.q-card{padding:16px 15px}
+  .issues,.cta{margin-left:14px;margin-right:14px}
+  .restart{margin-left:14px;margin-right:14px;width:calc(100% - 28px)}
+  .cta{padding:18px 14px}
+  .res-header{padding:24px 16px 18px}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="logo">e-<span>Budget</span></div>
+  <div class="badge">Самоаудит · 2026</div>
+</header>
+
+<section class="hero">
+  <div class="chip">Откройте вашу учётную политику · 10–12 минут</div>
+  <h1>Найдите эти формулировки<br>в <em>вашей</em> учётной политике</h1>
+  <p class="hero-sub">Не тест знаний — проверка вашего реального документа. Откройте учётную политику вашего учреждения и сверьтесь с каждым пунктом.</p>
+  <div class="hero-instruction">
+    <span class="icon">????</span>
+    <p><strong>Как проходить:</strong> откройте учётную политику вашего учреждения на утверждённую редакцию 2025 или 2026 года. На каждый вопрос — найдите указанный раздел и честно отметьте, есть ли там нужная формулировка.</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <div id="quiz">
+    <div class="prog-card">
+      <div class="prog-meta">
+        <span class="prog-label">Проверяем пункт</span>
+        <span class="prog-counter" id="counter">1 / 10</span>
+      </div>
+      <div class="prog-track">
+        <div class="prog-fill" id="prog-fill" style="width:10%"></div>
+      </div>
+    </div>
+
+    <div class="q-card" id="q-card">
+      <div class="q-cat" id="q-cat"></div>
+      <div class="section-box">
+        <div class="section-label">Найдите в учётной политике раздел:</div>
+        <div class="section-name" id="q-section"></div>
+      </div>
+      <div class="check-label">Проверьте: есть ли там следующее?</div>
+      <div class="check-text" id="q-text"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback">
+        <div class="fb-head" id="fb-head"></div>
+        <div class="fb-body" id="fb-body"></div>
+        <div class="correct-sample" id="correct-sample" style="display:none">
+          <div class="correct-sample-label">Как должно быть написано</div>
+          <div class="correct-sample-text" id="correct-sample-text"></div>
+        </div>
+        <div class="norm-tag" id="norm-tag"></div>
+      </div>
+      <button class="next-btn" id="next-btn" onclick="nextQ()">Следующий пункт →</button>
+    </div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="res-header" id="res-header">
+      <div class="res-score-wrap">
+        <div class="score-block">
+          <div class="score-big" id="s-ok">0</div>
+          <div class="score-label">Всё верно</div>
+        </div>
+        <div class="score-sep">·</div>
+        <div class="score-block">
+          <div class="score-big" style="color:#b45309" id="s-partly">0</div>
+          <div class="score-label">Частично</div>
+        </div>
+        <div class="score-sep">·</div>
+        <div class="score-block">
+          <div class="score-big" style="color:#b91c1c" id="s-no">0</div>
+          <div class="score-label">Не найдено</div>
+        </div>
+      </div>
+      <div class="res-title" id="res-title"></div>
+      <div class="res-sub" id="res-sub"></div>
+    </div>
+
+    <div class="issues">
+      <div class="issues-title">Детальный разбор по вашей учётной политике</div>
+      <div id="issues-list"></div>
+    </div>
+
+    <div class="cta">
+      <h3 id="cta-h"></h3>
+      <p id="cta-p"></p>
+      <div class="cta-btns">
+        <a href="https://e-budget.ru/members/signup" class="cta-a" id="cta-a">Зарегистрироваться бесплатно →</a>
+        <a href="https://t.me/EBudgetBot" class="cta-b">Через Telegram @EBudgetBot →</a>
+      </div>
+    </div>
+    <button class="restart" onclick="restart()">↺ Пройти проверку заново</button>
+  </div>
+
+  <div class="footer">
+    e-Budget · Лицензия № Л035-01255-50/01212821<br>
+    <a href="https://e-budget.ru">e-budget.ru</a> · <a href="mailto:bus.gov@e-budget.ru">bus.gov@e-budget.ru</a> · 8 499 398-06-70
+  </div>
+</div>
+
+<script>
+// answer types: 'yes' = всё верно, 'partly' = частично/не уверен, 'no' = не найдено/нет
+const Q = [
+  {
+    cat: `Нормативная база — раздел 1 учётной политики`,
+    section: `Раздел «Нормативная база» / «Правовые основания ведения учёта»`,
+    text: `Найдите в своей учётной политике перечень нормативных актов, на основании которых ведётся бухгалтерский учёт. Какие документы там перечислены?`,
+    opts: [
+      {
+        type:'no',
+        main:`Приказ Минфина № 157н «Об утверждении Единого плана счетов…» плюс Инструкции № 174н (или 162н/183н)`,
+        hint:``
+      },
+      {
+        type:'yes',
+        main:`Приказы Минфина № 121н (Единый план счетов), № 132н или № 133н (план счетов по типу учреждения), действующие СГС`,
+        hint:``
+      },
+      {
+        type:'partly',
+        main:`Приказ № 157н — с припиской «в редакции Приказа № 121н» или «с учётом изменений 2024 года»`,
+        hint:``
+      },
+    ],
+    fb_yes:    `Верно. Именно эти три приказа — новая нормативная база с 01.01.2026. Ссылка на них в разделе 1 — обязательное условие.`,
+    fb_partly: `Распространённая «косметическая» правка, которая создаёт иллюзию актуальности. Приказ № 157н утратил силу полностью — никакая редакционная оговорка его не реанимирует. Ссылка на него означает, что учётная политика опирается на несуществующий акт.`,
+    fb_no:     `Инструкция № 157н утратила силу с 01.01.2026 (заменена приказом № 121н). Инструкции № 162н, 174н, 183н — аналогично заменены приказами № 132н и № 133н. Учётная политика с такими ссылками юридически некорректна.`,
+    sample: `«Бухгалтерский учёт ведётся в соответствии с: СГС "Единый план счетов" (Приказ Минфина № 121н от 30.08.2024); СГС "План счетов бухгалтерского учёта бюджетных и автономных учреждений" (Приказ № 133н от 20.09.2024); действующими федеральными стандартами бухгалтерского учёта государственных финансов.»`,
+    norm:      `Приказы Минфина России № 121н от 30.08.2024, № 132н и № 133н от 20.09.2024`
+  },
+  {
+    cat: `КОСГУ 340/440 — детализация подстатей 341–349`,
+    section: `Раздел «Материальные запасы» или «Применение КОСГУ» / «Аналитический учёт»`,
+    text: `С 2026 года детализация КОСГУ 340/440 по подстатьям 341–349 стала необязательной. Как это отражено в вашей учётной политике?`,
+    opts: [
+      {
+        type:'partly',
+        main:`Подстатьи 341–349 по-прежнему применяются — как применялись до 2026 года, без специальной записи в политике`,
+        hint:``
+      },
+      {
+        type:'no',
+        main:`Детализация убрана полностью — учреждение перешло на код 340 без подстатей, как того требует Минфин`,
+        hint:``
+      },
+      {
+        type:'yes',
+        main:`В учётной политике прямо закреплено: применяем подстатьи 341–349 (или: применяем только код 340 без детализации) — конкретное решение зафиксировано`,
+        hint:``
+      },
+    ],
+    fb_yes:    `Верно. Неважно, какое именно решение принято — главное, что оно явно закреплено в учётной политике. Только тогда применение или неприменение подстатей имеет нормативное основание.`,
+    fb_partly: `До 2026 года применять подстатьи было обязательно — поэтому никакой записи в политике не требовалось. Теперь это право. А право нужно зафиксировать явно: иначе основания для применения подстатей нет. При проверке — замечание.`,
+    fb_no:     `Минфин не обязывал переходить на код 340 без детализации — он отменил обязательность. Учреждение вправе продолжать детализацию, если это нужно для управленческих целей или требует учредитель. Главное — закрепить это решение в учётной политике.`,
+    sample:    `«С 2026 года детализация КОСГУ по подстатьям 341–349 (441–449) применяется [применяется / не применяется] учреждением. [При применении: Аналитический учёт материальных запасов ведётся в разрезе подстатей 341–349.]»`,
+    norm:      `Приказ Минфина № 209н в редакции от 2025 г.; Письмо Минфина от 22.10.2025 № 02-01-06/102792`
+  },
+  {
+    cat: `Допустимые бухгалтерские записи — что оставить в учётной политике`,
+    section: `Раздел «Корреспонденция счетов» / «Типовые проводки» / «Порядок отражения операций»`,
+    text: `До 2026 года многие учётные политики содержали таблицы типовых проводок. Как этот раздел должен выглядеть сейчас?`,
+    opts: [
+      {
+        type:'no',
+        main:`Таблица проводок обновлена — старые корреспонденции заменены на новые согласно приказам № 132н/133н`,
+        hint:``
+      },
+      {
+        type:'yes',
+        main:`Таблица типовых проводок из учётной политики удалена или сведена к минимуму — остались только операции, не охваченные Приложениями к приказам № 132н/133н`,
+        hint:``
+      },
+      {
+        type:'partly',
+        main:`Раздел с проводками сохранён полностью «на всякий случай» — со ссылкой на то, что он применяется в части, не противоречащей новым стандартам`,
+        hint:``
+      },
+    ],
+    fb_yes:    `Верно. Приказы № 132н и 133н содержат Приложения с исчерпывающим перечнем «допустимых бухгалтерских записей». Дублировать их в учётной политике не нужно — и даже вредно: при расхождении возникает коллизия. В политике остаются только нестандартные ситуации.`,
+    fb_partly: `Оговорка «в части, не противоречащей» — это признание того, что часть таблицы противоречит новым стандартам. Проверяющий спросит: «Какая именно часть?» Ответа нет. Такая формулировка не защищает — она создаёт неопределённость.`,
+    fb_no:     `Если переписать проводки из Приложений к приказам № 132н/133н в учётную политику, при первом расхождении с официальным текстом стандарта — ошибка будет в учётной политике, а не в стандарте. Это ваш риск. Правильнее — ссылаться на Приложения, а в политике фиксировать только то, чего в Приложениях нет.`,
+    sample: `«Корреспонденция счетов при отражении хозяйственных операций определяется в соответствии с Приложением № 2 к СГС "План счетов бухгалтерского учёта" (Приказ № 133н). Для операций, не предусмотренных указанным Приложением, корреспонденция счетов устанавливается настоящей учётной политикой (Приложение № N).»`,
+    norm:      `СГС «План счетов бухгалтерского учёта бюджетных и автономных учреждений» (Приказ № 133н), Приложение № 2`
+  },
+  {
+    cat: `КВР 408 — лизинг в учётной политике`,
+    section: `Раздел «Основные средства» / «Аренда» → подраздел о лизинге и финансовой аренде`,
+    text: `В 2026 году введён новый КВР 408 для операций лизинга и финансовой аренды. Есть ли в учётной политике порядок его применения?`,
+    opts: [
+      {
+        type:'yes',
+        main:`Да — в разделе об аренде или ОС прописано, что при лизинге применяется КВР 408 в увязке с КОСГУ 310 или 330`,
+        hint:``
+      },
+      {
+        type:'partly',
+        main:`Лизинга у учреждения нет — поэтому КВР 408 в учётной политике не упоминается`,
+        hint:``
+      },
+      {
+        type:'no',
+        main:`Лизинг отражается по КВР 244 «Прочая закупка» — как и раньше, по аналогии с арендой`,
+        hint:``
+      },
+    ],
+    fb_yes:    `Верно. КВР 408 — специальный код для лизинга, введённый с 2026 года. Его увязка с КОСГУ 310 (приобретение ОС) или 330 (увеличение стоимости НФА) должна быть закреплена в учётной политике.`,
+    fb_partly: `«Лизинга нет» — сегодня. Но учётная политика утверждается на год вперёд и должна предусматривать ситуации, которые могут возникнуть. Отсутствие КВР 408 означает, что при появлении лизингового договора бухгалтер будет действовать без нормативного основания в своей политике.`,
+    fb_no:     `КВР 244 для лизинга с 2026 года неприменим — введён специальный код КВР 408. Применение КВР 244 вместо 408 искажает бюджетную классификацию и является нарушением, которое фиксируется при казначейском контроле.`,
+    sample:    `«При отражении операций по договорам лизинга (финансовой аренды) применяется КВР 408 в увязке с КОСГУ 310 (при признании предмета лизинга в составе ОС) или КОСГУ 330 (увеличение стоимости НФА). Первоначальная стоимость формируется по счёту 106.хх.»`,
+    norm:      `Приказ Минфина № 82н (в редакции 2025 г.), КВР 408; таблица увязки КВР и КОСГУ`
+  },
+  {
+    cat: `Контроль знака остатков — новое требование СГС 121н`,
+    section: `Раздел «Внутренний контроль» → процедуры контроля перед формированием отчётности`,
+    text: `Пункт 24 СГС «Единый план счетов» (приказ № 121н) вводит обязательный контроль соответствия остатков признаку счёта (А — активный, П — пассивный). Закреплена ли эта процедура в учётной политике?`,
+    opts: [
+      {
+        type:'no',
+        main:`Контроль остатков — задача бухгалтерской программы, а не учётной политики: программа сама сигнализирует об ошибках`,
+        hint:``
+      },
+      {
+        type:'partly',
+        main:`В разделе о внутреннем контроле написано «контроль за правильностью ведения учёта осуществляется главным бухгалтером» — без указания конкретной процедуры`,
+        hint:``
+      },
+      {
+        type:'yes',
+        main:`В разделе внутреннего контроля прописана ежемесячная проверка: кредитовый остаток на активном счёте или дебетовый на пассивном — основание для служебной проверки`,
+        hint:``
+      },
+    ],
+    fb_yes:    `Верно. Именно такая формулировка рекомендована Минфином в Письме о внесении изменений в учётную политику под новые стандарты. Это не техническая функция программы, а контрольная процедура, обязательная к закреплению.`,
+    fb_partly: `«Главный бухгалтер осуществляет контроль» — это общий тезис, а не процедура. Проверяющий спросит: «По какому алгоритму? С какой периодичностью? Что является основанием для служебной проверки?» В политике ответа нет.`,
+    fb_no:     `Программа — инструмент. Нормативное закрепление процедуры контроля — обязанность учреждения. Пункт 24 СГС «Единый план счетов» прямо требует, чтобы порядок контроля за признаком счётов был закреплён в учётных документах учреждения.`,
+    sample:    `«Ежемесячно, не позднее [дата], перед формированием отчётности ответственный бухгалтер проверяет соответствие остатков на синтетических счетах их признаку (А/П/А-П). Выявление кредитового остатка на активном счёте или дебетового на пассивном является основанием для проведения служебной проверки.»`,
+    norm:      `Пункт 24 СГС «Единый план счетов» (Приказ № 121н); Письмо Минфина от 22.12.2025 № 02-07-08/124785`
+  },
+  {
+    cat: `Ретроспективный пересчёт при переходе на новые СГС`,
+    section: `Вводный раздел учётной политики / приказ о переходе на новые стандарты`,
+    text: `Нужно ли было учреждению пересчитать проводки и остатки за 2025 год и более ранние периоды при переходе на новые стандарты с 01.01.2026?`,
+    opts: [
+      {
+        type:'partly',
+        main:`Да, ретроспективный пересчёт обязателен — входящие остатки на 01.01.2026 должны быть приведены в соответствие с новыми стандартами`,
+        hint:``
+      },
+      {
+        type:'no',
+        main:`Пересчёт не нужен, но нужно сформировать сравнительные показатели за 2025 год в новой классификации`,
+        hint:``
+      },
+      {
+        type:'yes',
+        main:`Ретроспективный пересчёт не требуется: проводки 2025 года и ранее остаются без изменений, новые правила применяются к операциям с 01.01.2026`,
+        hint:``
+      },
+    ],
+    fb_yes:    `Верно. Минфин прямо указал: ретроспективно менять проводки за 2025 год и ранее не требуется. Учётная политика должна содержать именно эту оговорку — иначе бухгалтеры могут начать ненужную работу или, наоборот, не знать, как действовать.`,
+    fb_partly: `Обязательного ретроспективного пересчёта нет — и это официальная позиция Минфина. Правила нового СГС применяются к операциям начиная с 01.01.2026. Требование ретроспективного пересчёта создало бы нагрузку, несопоставимую с задачами реформы.`,
+    fb_no:     `Сравнительные показатели в новой классификации — это требование МСФО при полном переходе. К данной реформе оно не применяется. В учётной политике достаточно зафиксировать: новые правила применяются с 01.01.2026, к предшествующим периодам не применяются.`,
+    sample: `«Положения СГС "Единый план счетов" (Приказ № 121н) и СГС "План счетов бухгалтерского учёта" (Приказ № 133н) применяются к фактам хозяйственной жизни, совершённым начиная с 01 января 2026 года. Ретроспективный пересчёт показателей за периоды, предшествующие 01.01.2026, не производится.»`,
+    norm:      `Методические рекомендации Минфина по переходу на новые СГС (Письмо от 22.12.2025 № 02-07-08/124785); СГС «Учётная политика, оценочные значения и ошибки», п. 17`
+  },
+  {
+    cat: `Публикация учётной политики — новое требование 2026 года`,
+    section: `Приказ об утверждении учётной политики или вводный раздел`,
+    text: `СГС «Учётная политика» обязывает учреждение публиковать основные положения учётной политики. Закреплён ли в приказе об утверждении политики срок и место публикации?`,
+    opts: [
+      {
+        type:'yes',
+        main:`Да — в приказе указано: опубликовать основные положения на официальном сайте учреждения в течение 10 рабочих дней с даты утверждения`,
+        hint:``
+      },
+      {
+        type:'no',
+        main:`Учётная политика — внутренний документ, публикации не подлежит; размещается только по запросу контролирующих органов`,
+        hint:``
+      },
+      {
+        type:'partly',
+        main:`Учётная политика размещена на сайте — но только по факту, без конкретного срока в приказе об утверждении`,
+        hint:``
+      },
+    ],
+    fb_yes:    `Верно. Именно такая формулировка — 10 дней с даты утверждения, официальный сайт учреждения — закреплена в стандартном приказе, рекомендованном Минфином при переходе на новые СГС.`,
+    fb_partly: `Публикация есть — но без закреплённого срока в приказе это не выполнение требования, а случайное совпадение. При проверке будет замечание: формальное требование о сроке публикации не зафиксировано.`,
+    fb_no:     `С 2026 года основные положения учётной политики подлежат обязательному раскрытию на официальном сайте учреждения. Это прямое требование обновлённого СГС «Учётная политика, оценочные значения и ошибки». Закрытость учётной политики — нарушение принципа прозрачности.`,
+    sample:    `Пункт приказа: «2. Опубликовать основные положения учётной политики на официальном сайте учреждения [адрес] в течение 10 рабочих дней с даты подписания настоящего приказа.»`,
+    norm:      `Подп. «д» п. 9 СГС «Учётная политика, оценочные значения и ошибки»; Приказ Минфина о внесении изменений`
+  },
+  {
+    cat: `Дополнительные забалансовые счета`,
+    section: `Приложение «Рабочий план счетов» → раздел «Забалансовые счета»`,
+    text: `Новый СГС «Единый план счетов» (приказ № 121н) предоставляет учреждениям право вводить дополнительные забалансовые счета сверх утверждённого перечня. Воспользовалось ли учреждение этим правом — и закреплено ли это в рабочем плане счетов?`,
+    opts: [
+      {
+        type:'partly',
+        main:`Учреждение использует только стандартные забалансовые счета из перечня СГС — дополнительных нет, запись об этом в политике отсутствует`,
+        hint:``
+      },
+      {
+        type:'no',
+        main:`Дополнительные забалансовые счета не предусмотрены стандартами — вводить их нельзя, это нарушение единообразия учёта`,
+        hint:``
+      },
+      {
+        type:'yes',
+        main:`В рабочем плане счетов явно указано: применяются такие-то дополнительные забалансовые счета (или: дополнительные забалансовые счета не применяются) — решение зафиксировано`,
+        hint:``
+      },
+    ],
+    fb_yes:    `Верно. Пункт 19 СГС «Единый план счетов» прямо предоставляет право вводить дополнительные забалансовые счета — при условии закрепления в рабочем плане счетов. Важно зафиксировать решение в любую сторону.`,
+    fb_partly: `Использование только стандартных счетов — корректно. Но отсутствие записи об этом создаёт неопределённость: проверяющий не может понять, учреждение сознательно отказалось от дополнительных счетов или просто не задумывалось об этом.`,
+    fb_no:     `До 2026 года — верно. С 2026 года пункт 19 приказа № 121н прямо разрешает устанавливать дополнительные забалансовые счета в рабочем плане счетов. Это новое право учреждений, которое многие не заметили при переходе.`,
+    sample: `«Кроме забалансовых счетов, утверждённых в СГС "Единый план счетов" № 121н, учреждение применяет следующие дополнительные забалансовые счета: [перечень] / дополнительные забалансовые счета учреждением не применяются.»`,
+    norm:      `Пункт 19 СГС «Единый план счетов» (Приказ № 121н от 30.08.2024)`
+  },
+  {
+    cat: `Резерв на оплату отпусков — метод и счёт учёта`,
+    section: `Раздел «Резервы предстоящих расходов» → резерв на оплату отпусков`,
+    text: `Найдите в учётной политике описание резерва на оплату отпусков. Что там написано о методе расчёта и счёте учёта?`,
+    opts: [
+      {
+        type:'no',
+        main:`«Резерв формируется в размере суммы начисленных, но не выплаченных отпускных на дату составления отчётности»`,
+        hint:``
+      },
+      {
+        type:'yes',
+        main:`Прописан конкретный метод (нормативный или % от ФОТ), периодичность начисления, счёт Дт 401.20 — Кт 401.60, и порядок использования резерва при начислении отпускных`,
+        hint:``
+      },
+      {
+        type:'partly',
+        main: `«Резерв на оплату отпусков создаётся ежегодно в соответствии с СГС "Резервы"» — метод расчёта не указан, счёт 401.60 упомянут`,
+        hint:``
+      },
+    ],
+    fb_yes:    `Верно. Полное закрепление: метод, периодичность (ежемесячно!), корреспонденция счетов и порядок использования при фактическом начислении отпускных. Всё это вместе — рабочий инструмент, а не декларация.`,
+    fb_partly: `Два замечания: резерв создаётся не «ежегодно», а ежемесячно равными долями — иначе это не резерв, а единовременное начисление. И отсутствие метода означает, что сумму резерва невозможно проверить и обосновать.`,
+    fb_no:     `Инвентаризационный метод (факт неиспользованных дней) — допустимый подход, но требует дополнительных уточнений: как часто пересчитывается, какой счёт, что делать при превышении резерва фактическими начислениями. Без этого — неполное закрепление.`,
+    sample:    `«Резерв на оплату отпусков формируется ежемесячно методом [нормативным / % от ФОТ]. Сумма ежемесячного отчисления: [формула]. Проводка начисления: Дт 0.401.20.211 Кт 0.401.60.211. При начислении отпускных: Дт 0.401.60.211 Кт 0.302.11.730.»`,
+    norm:      `СГС «Резервы. Раскрытие информации об условных обязательствах», п. 6–11; счёт 401.60 по новому плану счетов`
+  },
+  {
+    cat: `Метод определения справедливой стоимости при поступлении активов`,
+    section: `Раздел «Методы оценки объектов бухгалтерского учёта» → оценка при безвозмездном поступлении`,
+    text: `Учреждению безвозмездно передали компьютер. По какой стоимости его нужно принять к учёту — и закреплён ли этот метод в учётной политике?`,
+    opts: [
+      {
+        type:'partly',
+        main:`По остаточной балансовой стоимости у передающей стороны согласно передаточным документам — метод в политике не описан`,
+        hint:``
+      },
+      {
+        type:'no',
+        main:`По нулевой стоимости — безвозмездная передача означает отсутствие затрат учреждения`,
+        hint:``
+      },
+      {
+        type:'yes',
+        main:`По справедливой (рыночной) стоимости на дату принятия к учёту — метод определения справедливой стоимости закреплён в учётной политике со ссылкой на СГС «Концептуальные основы»`,
+        hint:``
+      },
+    ],
+    fb_yes:    `Верно. Безвозмездно полученные активы принимаются по справедливой стоимости. Метод её определения (рыночные цены, данные оценщика, комиссионная оценка) должен быть явно закреплён в учётной политике.`,
+    fb_partly: `Остаточная стоимость у передающей стороны — это один из допустимых способов, но только если он закреплён в учётной политике. Без закрепления — нет основания. Кроме того, этот метод применим не всегда: если передающая сторона полностью самортизировала объект, остаточная стоимость = 0, что искажает учёт.`,
+    fb_no:     `Принятие актива по нулевой стоимости нарушает принцип достоверности и искажает баланс. Нулевая стоимость допустима только для НМА, полученных в рамках лицензионных договоров без возмещения — специальная норма, не общее правило.`,
+    sample:    `«Объекты, полученные безвозмездно, принимаются к учёту по справедливой стоимости, определяемой методом рыночных цен на дату принятия к учёту. Справедливая стоимость устанавливается решением постоянно действующей комиссии на основании данных о рыночных ценах аналогичных объектов.»`,
+    norm:      `СГС «Концептуальные основы», п. 54–59; СГС «Основные средства», п. 22`
+  },
+];
+
+let cur = 0;
+let answers = []; // {type: 'yes'|'partly'|'no', topic}
+
+function render() {
+  const q = Q[cur];
+  document.getElementById('counter').textContent = `${cur+1} / ${Q.length}`;
+  document.getElementById('prog-fill').style.width = `${((cur+1)/Q.length)*100}%`;
+  document.getElementById('q-cat').textContent = q.cat;
+  document.getElementById('q-section').textContent = q.section;
+  document.getElementById('q-text').textContent = q.text;
+
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  q.opts.forEach((o,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.setAttribute('data-type', o.type);
+    btn.innerHTML = `<div class="opt-dot"></div><div class="opt-body"><div class="opt-main">${o.main}</div></div>`;
+    btn.onclick = () => select(o.type, i);
+    opts.appendChild(btn);
+  });
+
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('next-btn').className = 'next-btn';
+
+  const card = document.getElementById('q-card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'fadeUp .35s ease';
+}
+
+function select(type, idx) {
+  const q = Q[cur];
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = true;
+    if (b.getAttribute('data-type') === type) b.classList.add(`ans-${type}`);
+  });
+  answers.push({ type, topic: q.cat, section: q.section });
+
+  const fb = document.getElementById('feedback');
+  const fbHead = document.getElementById('fb-head');
+  const fbBody = document.getElementById('fb-body');
+  const sample = document.getElementById('correct-sample');
+  const sampleText = document.getElementById('correct-sample-text');
+  const normTag = document.getElementById('norm-tag');
+
+  const heads = { yes: '✓ Хорошо — этот пункт в порядке', partly: '⚠ Частично — формулировка требует уточнения', no: '✗ Не найдено — это нужно добавить' };
+  const bodies = { yes: q.fb_yes, partly: q.fb_partly, no: q.fb_no };
+  const classes = { yes: 'fb-yes', partly: 'fb-partly', no: 'fb-no' };
+
+  fb.className = `feedback ${classes[type]} show`;
+  fbHead.textContent = heads[type];
+  fbBody.innerHTML = bodies[type];
+
+  if (type !== 'yes') {
+    sample.style.display = 'block';
+    sampleText.textContent = q.sample;
+  } else {
+    sample.style.display = 'none';
+  }
+  normTag.textContent = '???? ' + q.norm;
+
+  const nb = document.getElementById('next-btn');
+  nb.textContent = cur < Q.length-1 ? 'Следующий пункт →' : 'Получить заключение →';
+  nb.className = 'next-btn show';
+}
+
+function nextQ() {
+  cur++;
+  if (cur < Q.length) render();
+  else showResult();
+}
+
+function showResult() {
+  document.getElementById('quiz').style.display = 'none';
+  const res = document.getElementById('result');
+  res.classList.add('show');
+
+  const ok = answers.filter(a=>a.type==='yes').length;
+  const partly = answers.filter(a=>a.type==='partly').length;
+  const no = answers.filter(a=>a.type==='no').length;
+
+  document.getElementById('s-ok').textContent = ok;
+  document.getElementById('s-partly').textContent = partly;
+  document.getElementById('s-no').textContent = no;
+
+  let level, title, sub, ctaH, ctaP, ctaA;
+  const problems = no + partly;
+
+  if (no >= 6) {
+    level = 'level-red';
+    title = 'Учётная политика требует существенной доработки';
+    sub = `Не найдено или некорректно: ${problems} из 10 ключевых пунктов. Это типовые нарушения, которые фиксируются при проверках казначейства и органов финансового контроля.`;
+    ctaH = 'На вебинаре разберём каждый из этих пунктов';
+    ctaP = '25 марта — практический разбор с готовыми формулировками. Возьмёте с собой текст, который можно утвердить.';
+    ctaA = 'Зарегистрироваться на разбор бесплатно →';
+  } else if (problems >= 4) {
+    level = 'level-amber';
+    title = 'Есть значимые пробелы — стоит доработать до проверки';
+    sub = `Требуют уточнения: ${problems} из 10 пунктов. Часть формулировок устарела или сформулирована слишком общо — это риски при аудите.`;
+    ctaH = 'Получите готовые формулировки на разборе';
+    ctaP = 'На вебинаре 25 марта — конкретный текст для каждого раздела, который вы можете взять в свою политику.';
+    ctaA = 'Зарегистрироваться на разбор →';
+  } else {
+    level = 'level-green';
+    title = 'Ваша политика в хорошем состоянии';
+    sub = `Проблемных пунктов: ${problems} из 10. Приходите на разбор 25 марта — разберём актуальные изменения, которые ещё не вошли в открытые источники.`;
+    ctaH = 'Подтвердите готовность к проверке';
+    ctaP = 'На вебинаре — изменения 2026 года и типовые ошибки, которые находят при проверках прямо сейчас.';
+    ctaA = 'Зарегистрироваться и получить материалы →';
+  }
+
+  res.className = `result show ${level}`;
+  document.getElementById('res-title').textContent = title;
+  document.getElementById('res-sub').textContent = sub;
+  document.getElementById('cta-h').textContent = ctaH;
+  document.getElementById('cta-p').textContent = ctaP;
+  document.getElementById('cta-a').textContent = ctaA;
+
+  const list = document.getElementById('issues-list');
+  list.innerHTML = '';
+  answers.forEach((a,i) => {
+    const iconMap = { yes:'✓', partly:'~', no:'✗' };
+    const classMap = { yes:'ii-ok', partly:'ii-warn', no:'ii-bad' };
+    const descMap = {
+      yes:    'Пункт в порядке — формулировка актуальна',
+      partly: 'Формулировка есть, но требует конкретизации',
+      no:     'Пункт отсутствует или содержит ссылку на недействующий акт'
+    };
+    const div = document.createElement('div');
+    div.className = 'issue-item';
+    div.innerHTML = `
+      <div class="issue-icon ${classMap[a.type]}">${iconMap[a.type]}</div>
+      <div class="issue-content">
+        <div class="issue-topic">${a.topic}</div>
+        <div class="issue-desc">${descMap[a.type]}</div>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function restart() {
+  cur = 0; answers = [];
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('result').className = 'result';
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>

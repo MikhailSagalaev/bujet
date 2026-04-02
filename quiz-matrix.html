@@ -594,7 +594,7 @@
         <div class="eb-success__icon">✅</div>
         <div class="eb-success__title">Матрица направлена на ваш email</div>
         <div class="eb-success__sub">Проверьте почту — в письме статус готовности, слабый контур и первый шаг. Пока ждёте письмо — пройдите детальный самоаудит учётной политики прямо сейчас.</div>
-        <a href="https://e-budget.ru/audit-2026.html" class="eb-success__link">Перейти к детальному самоаудиту →</a>
+        <a href="https://e-budget.ru/audit-2026" class="eb-success__link">Перейти к детальному самоаудиту →</a>
       </div>
 
     </div><!-- /card -->
@@ -617,12 +617,12 @@
   const gateForm = document.getElementById('ebGateForm');
   const gateBack = document.getElementById('ebGateBack');
   const success  = document.getElementById('ebSuccess');
-  const submitBtn = document.getElementById('submitBtn');
+  const submitBtn = document.getElementById('ebSubmitBtn');
   const gateError = document.getElementById('ebGateError');
   const emailInput = document.getElementById('ebEmail');
 
   /* Вебхук — URL вашего backend API */
-  const WEBHOOK_URL = 'https://e-budget.ru/api/quiz/submit';
+  const WEBHOOK_URL = 'https://app.e-budget.ru/api/quiz/submit';
 
   function render(i) {
     steps.forEach(function(s, idx) {

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Перечень локальных актов к проверке — e-budget.ru</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, Helvetica, sans-serif; background: #f4f6f8; color: #1a1f2e; }
+
+.page { max-width: 800px; margin: 0 auto; padding: 40px 20px 60px; }
+
+.header { margin-bottom: 36px; }
+.header__logo { font-size: 13px; font-weight: 700; color: #00a888; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+.header__title { font-size: 30px; font-weight: 700; line-height: 1.2; color: #1a1f2e; margin-bottom: 10px; }
+.header__sub { font-size: 16px; color: #64748b; line-height: 1.6; }
+
+.badge { display: inline-block; padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; margin-bottom: 20px; }
+.badge--red { background: rgba(239,68,68,.1); color: #dc2626; }
+.badge--amber { background: rgba(245,158,11,.12); color: #d97706; }
+.badge--green { background: rgba(0,201,167,.12); color: #00a888; }
+
+.section { background: #fff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 28px 32px; margin-bottom: 20px; }
+.section__title { font-size: 18px; font-weight: 700; color: #1a1f2e; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.section__note { font-size: 13px; color: #94a3b8; margin-bottom: 18px; }
+
+.act-list { display: flex; flex-direction: column; gap: 10px; }
+
+.act {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 12px;
+  align-items: start;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #fafbfc;
+}
+
+.act--crit { border-color: #fca5a5; background: #fff5f5; }
+.act--med  { border-color: #fcd34d; background: #fffbeb; }
+.act--ok   { border-color: #6ee7b7; background: #f0fefa; }
+
+.act__num {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: #1a1f2e;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.act--crit .act__num { background: #dc2626; }
+.act--med .act__num { background: #d97706; }
+.act--ok .act__num { background: #00a888; }
+
+.act__body { }
+.act__name { font-size: 15px; font-weight: 700; color: #1a1f2e; margin-bottom: 4px; }
+.act__what { font-size: 13px; color: #64748b; line-height: 1.5; }
+
+.act__check {
+  width: 22px; height: 22px;
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all .15s;
+  margin-top: 2px;
+}
+
+.act__check:checked {
+  background: #00C9A7;
+  border-color: #00C9A7;
+}
+
+.priority-legend {
+  display: flex; gap: 20px; flex-wrap: wrap;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+
+.pl-item { display: flex; align-items: center; gap: 6px; color: #64748b; }
+.pl-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+.cta { background: linear-gradient(135deg, #00C9A7, #0ea5e9); border-radius: 16px; padding: 28px 32px; margin-top: 24px; }
+.cta__title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.cta__sub { font-size: 15px; color: rgba(255,255,255,.85); margin-bottom: 20px; line-height: 1.5; }
+.cta__btn { display: inline-block; background: #fff; color: #1a1f2e; text-decoration: none; font-size: 15px; font-weight: 700; padding: 13px 26px; border-radius: 10px; }
+
+.progress-bar { background: #e2e8f0; border-radius: 999px; height: 8px; margin-top: 8px; overflow: hidden; }
+.progress-bar__fill { height: 100%; background: linear-gradient(90deg, #00C9A7, #0ea5e9); border-radius: 999px; width: 0%; transition: width .4s; }
+.progress-text { font-size: 13px; color: #94a3b8; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header__logo">E-BUDGET.RU · СТАРТ ПОДГОТОВКИ 2026</div>
+    <h1 class="header__title">Какие локальные акты проверить первыми</h1>
+    <p class="header__sub">Конкретный перечень для учреждений на стадии «Стартовая зона» — по каждому документу указано что именно смотреть.</p>
+  </div>
+
+  <div class="priority-legend">
+    <div class="pl-item"><div class="pl-dot" style="background:#dc2626"></div>Критично — проверить до конца апреля</div>
+    <div class="pl-item"><div class="pl-dot" style="background:#d97706"></div>Важно — проверить до конца мая</div>
+    <div class="pl-item"><div class="pl-dot" style="background:#00a888"></div>Можно отложить на II квартал</div>
+  </div>
+
+  <!-- Блок 1: Учётная политика -->
+  <div class="section">
+    <div class="section__title">
+      <span>📄</span> Учётная политика
+    </div>
+    <div class="section__note">Главный документ. Большинство замечаний возникают именно здесь.</div>
+    <div class="act-list">
+
+      <div class="act act--crit">
+        <div class="act__num">1</div>
+        <div class="act__body">
+          <div class="act__name">Соответствие новым ФСБУ «Учётная политика» (№ 274н)</div>
+          <div class="act__what">Проверить: есть ли в тексте ссылки на 274н, 197н, 256н. Формулировки «согласно Инструкции 157н» без уточнения — красный флаг.</div>
+        </div>
+        <input type="checkbox" class="act__check">
+      </div>
+
+      <div class="act act--crit">
+        <div class="act__num">2</div>
+        <div class="act__body">
+          <div class="act__name">Метод амортизации ОС и НМА</div>
+          <div class="act__what">Должен быть прямо указан (линейный / уменьшаемого остатка / пропорционально объёму). Просто «согласно законодательству» — не принимается.</div>
+        </div>
+        <input type="checkbox" class="act__check">
+      </div>
+
+      <div class="act act--crit">
+        <div class="act__num">3</div>
+        <div class="act__body">
+          <div class="act__name">Критерии признания активов и обязательств</div>
+          <div class="act__what">По ФСБУ «Концептуальные основы» (256н) — нужны конкретные пороговые суммы и признаки. Не просто «существенные».</div>
+        </div>
+        <input type="checkbox" class="act__check">
+      </div>
+
+      <div class="act act--med">
+        <div class="act__num">4</div>
+        <div class="act__body">
+          <div class="act__name">Порядок отражения событий после отчётной даты</div>
+          <div class="act__what">ФСБУ 274н требует отдельного раздела. Если раздела нет — добавить до сдачи годовой отчётности 2026.</div>
+        </div>
+        <input type="checkbox" class="act__check">
+      </div>
+
+      <div class="act act--med">
+        <div class="act__num">5</div>
+        <div class="act__body">
+          <div class="act__name">Формы первичных документов в приложении</div>
+          <div class="act__what">Проверить что приложения актуальны: формы из приказа № 61н (2021) должны быть заменены на актуальные или утверждены самостоятельно.</div>
+        </div>
+        <input type="checkbox" class="act__check">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Блок 2: График документооборота -->
+  <div class="section">
+    <div class="section__title">
+      <span>🗂️</span> График документооборота
+    </div>
+    <div class="section__note">Часто не обновляется годами. При проверке — один из первых запросов.</div>
+    <div class="act-list">
+
+      <div class="act act--crit">
+        <div class="act__num">6</div>
+        <div class="act__body">
+          <div class="act__name">Актуальность ответственных лиц</div>
+          <div class="act__what">Если в графике стоят имена сотрудников которые уже не работают — это нарушение. Проверить все графы «ответственный».</div>
+        </div>
+        <input type="checkbox" class="act__check">
+      </div>
+
+      <div class="act act--med">
+        <div class="act__num">7</div>
+        <div class="act__body">
+          <div class="act__name">Электронные документы и ЭЦП</div>
+          <div class="act__what">Если учреждение перешло на ЭДО — в графике должны быть отражены электронные формы и порядок их подписания.</div>
+        </div>
+        <input type="checkbox" class="act__check">
+      </div>
+
+      <div class="act act--ok">
+        <div class="act__num">8</div>
+        <div class="act__body">
+          <div class="act__name">Сроки хранения документов</div>
+          <div class="act__what">Проверить соответствие приказу Росархива № 236 от 2019. Изменения незначительные, но лучше обновить.</div>
+        </div>
+        <input type="checkbox" class="act__check">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Блок 3: Положение о внутреннем контроле -->
+  <div class="section">
+    <div class="section__title">
+      <span>🔍</span> Положение о внутреннем контроле
+    </div>
+    <div class="section__note">Требования ФСБУ «Внутренний контроль» (фактически введён с 2024) меняют логику документа.</div>
+    <div class="act-list">
+
+      <div class="act act--crit">
+        <div class="act__num">9</div>
+        <div class="act__body">
+          <div class="act__name">Наличие карты рисков или реестра контрольных процедур</div>
+          <div class="act__what">Ключевое требование нового ФСБУ. Без этого документа положение о ВК считается неполным.</div>
+        </div>
+        <input type="checkbox" class="act__check">
+      </div>
+
+      <div class="act act--med">
+        <div class="act__num">10</div>
+        <div class="act__body">
+          <div class="act__name">Распределение контрольных функций между сотрудниками</div>
+          <div class="act__what">Должно быть указано кто осуществляет предварительный, текущий и последующий контроль — и в каких ситуациях.</div>
+        </div>
+        <input type="checkbox" class="act__check">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Счётчик -->
+  <div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:24px 32px;margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:15px;font-weight:700;color:#1a1f2e;">Прогресс проверки</span>
+      <span style="font-size:15px;font-weight:700;color:#00a888;" id="progressText">0 из 10</span>
+    </div>
+    <div class="progress-bar"><div class="progress-bar__fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressNote">Начните с критичных пунктов (красные)</div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <div class="cta__title">Нашли что требует обновления?</div>
+    <div class="cta__sub">Пройдите детальный самоаудит — он проверит конкретные формулировки учётной политики и подскажет точные правки.</div>
+    <a href="https://e-budget.ru/audit-2026html" class="cta__btn">Пройти детальный самоаудит →</a>
+  </div>
+
+  <p style="margin-top:28px;font-size:13px;color:#94a3b8;text-align:center;">e-budget.ru · 2026 · Методология бухучёта для госучреждений</p>
+
+</div>
+
+<script>
+const checks = document.querySelectorAll('.act__check');
+const fill = document.getElementById('progressFill');
+const text = document.getElementById('progressText');
+const note = document.getElementById('progressNote');
+const total = checks.length;
+
+function update() {
+  const done = [...checks].filter(c => c.checked).length;
+  const pct = Math.round((done / total) * 100);
+  fill.style.width = pct + '%';
+  text.textContent = done + ' из ' + total;
+  if (done === 0) note.textContent = 'Начните с критичных пунктов (красные)';
+  else if (done < 5) note.textContent = 'Хорошее начало — продолжайте';
+  else if (done < total) note.textContent = 'Почти готово — осталось ' + (total - done);
+  else note.textContent = '✅ Все пункты проверены';
+}
+
+checks.forEach(c => c.addEventListener('change', update));
+</script>
+</body>
+</html>
