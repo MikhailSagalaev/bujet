@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Матрица готовности 2026 — e-budget.ru</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.eb-matrix {
+  padding: 60px 16px;
+  background: #f7f7f7;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1a1f2e;
+}
+
+.eb-matrix__wrap {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ── Левая панель ── */
+.eb-matrix__intro { }
+
+.eb-matrix__badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(0,201,167,0.12);
+  color: #00a888;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.eb-matrix__title {
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #1a1f2e;
+  margin-bottom: 14px;
+}
+
+.eb-matrix__sub {
+  font-size: 16px;
+  line-height: 1.65;
+  color: #64748b;
+  margin-bottom: 24px;
+}
+
+.eb-matrix__meta {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.eb-matrix__meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1f2e;
+}
+
+.eb-matrix__meta span::before {
+  content: "";
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00C9A7, #0ea5e9);
+  flex-shrink: 0;
+}
+
+.eb-matrix__info-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1.5px solid #e2e8f0;
+  padding: 22px 24px;
+}
+
+.eb-matrix__info-card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1f2e;
+  margin-bottom: 12px;
+}
+
+.eb-matrix__info-card ul {
+  padding-left: 18px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+/* ── Правая панель — карточка квиза ── */
+.eb-matrix__card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  padding: 36px 40px 40px;
+}
+
+/* Прогресс */
+.eb-prog {
+  margin-bottom: 28px;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+  overflow: hidden;
+}
+
+.eb-prog--hidden {
+  opacity: 0;
+  max-height: 0;
+  margin-bottom: 0;
+  pointer-events: none;
+}
+
+.eb-prog__top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.eb-prog__track {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.eb-prog__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00C9A7, #0ea5e9);
+  border-radius: 3px;
+  transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Шаги */
+.eb-step { display: none; }
+.eb-step.active { display: block; }
+
+.eb-step__q {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1f2e;
+  margin-bottom: 18px;
+  line-height: 1.35;
+}
+
+.eb-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+.eb-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  font-size: 15px;
+  color: #1a1f2e;
+  line-height: 1.4;
+}
+
+.eb-opt:hover { border-color: #7dd3fc; background: #f0f9ff; }
+
+.eb-opt input[type="radio"] { display: none; }
+
+.eb-opt__dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+}
+
+.eb-opt input:checked ~ .eb-opt__dot {
+  border-color: #00C9A7;
+  background: #00C9A7;
+}
+
+.eb-opt input:checked ~ .eb-opt__dot::after {
+  content: "";
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.eb-opt:has(input:checked) {
+  border-color: #00C9A7;
+  background: #f0fefa;
+}
+
+/* Навигация */
+.eb-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.eb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 13px 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.eb-btn:active { transform: scale(0.97); }
+
+.eb-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.eb-btn--primary {
+  background: linear-gradient(90deg, #00C9A7, #0ea5e9);
+  color: #fff;
+}
+
+.eb-btn--ghost {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* Gate — email форма */
+.eb-gate { display: none; }
+
+.eb-gate__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #94a3b8;
+  cursor: pointer;
+  border: none;
+  background: none;
+  margin-bottom: 20px;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+
+.eb-gate__back:hover { color: #64748b; }
+
+.eb-gate__icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #00C9A7, #0ea5e9);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+}
+
+.eb-gate__icon svg {
+  width: 26px; height: 26px;
+  stroke: #fff; fill: none;
+}
+
+.eb-gate__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1f2e;
+  margin-bottom: 10px;
+}
+
+.eb-gate__sub {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.eb-gate__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.eb-gate__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #334155;
+}
+
+.eb-gate__check {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(0,201,167,0.12);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.eb-gate__check svg {
+  width: 11px; height: 11px;
+  stroke: #00a888;
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.eb-gate__row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.eb-gate__input {
+  flex: 1;
+  padding: 13px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #1a1f2e;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.eb-gate__input:focus { border-color: #00C9A7; }
+
+.eb-gate__input--error { border-color: #ef4444; }
+
+.eb-gate__note {
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.eb-gate__error-msg {
+  display: none;
+  font-size: 13px;
+  color: #ef4444;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+/* Статус отправки */
+.eb-success { display: none; text-align: center; }
+
+.eb-success__icon {
+  font-size: 48px;
+  margin-bottom: 14px;
+}
+
+.eb-success__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1f2e;
+  margin-bottom: 10px;
+}
+
+.eb-success__sub {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.eb-success__link {
+  display: inline-block;
+  background: linear-gradient(90deg, #00C9A7, #0ea5e9);
+  color: #fff;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 12px;
+}
+
+/* Ошибка валидации */
+.eb-step.shake { animation: shake 0.35s ease; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* Адаптив */
+@media (max-width: 860px) {
+  .eb-matrix__wrap { grid-template-columns: 1fr; }
+  .eb-matrix__card { padding: 28px 24px 32px; }
+}
+</style>
+</head>
+<body>
+
+<section class="eb-matrix">
+  <div class="eb-matrix__wrap">
+
+    <!-- Левая: описание -->
+    <div class="eb-matrix__intro">
+      <div class="eb-matrix__badge">B2G-диагностика 2026</div>
+      <h2 class="eb-matrix__title">Определите уровень готовности учреждения к 2026 году</h2>
+      <p class="eb-matrix__sub">Не тест и не «развлекательный квиз». Система формирует матрицу готовности по 4 управленческим контурам. На выходе — понятный статус и первый пакет действий.</p>
+
+      <div class="eb-matrix__meta">
+        <span>6 шагов</span>
+        <span>3 минуты</span>
+        <span>Матрица на email</span>
+      </div>
+
+      <div class="eb-matrix__info-card">
+        <h3>Что получите по итогам</h3>
+        <ul>
+          <li>Статус готовности учреждения к 2026 году</li>
+          <li>Слабый контур: документы / процессы / контроль</li>
+          <li>Что критично проверить в первую очередь</li>
+          <li>Следующий шаг без лишней теории</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Правая: квиз -->
+    <div class="eb-matrix__card">
+
+      <!-- Прогресс -->
+      <div class="eb-prog" id="ebProg">
+        <div class="eb-prog__top">
+          <span id="ebProgLabel">Шаг 1 из 6</span>
+          <span id="ebProgPct">17%</span>
+        </div>
+        <div class="eb-prog__track">
+          <div class="eb-prog__fill" id="ebProgFill" style="width:17%"></div>
+        </div>
+      </div>
+
+      <!-- Вопросы -->
+      <div id="ebSteps">
+
+        <!-- Шаг 1: тип учреждения -->
+        <div class="eb-step active" id="step0">
+          <div class="eb-step__q">Тип вашего учреждения:</div>
+          <div class="eb-options" role="radiogroup" aria-label="Тип учреждения">
+            <label class="eb-opt"><input type="radio" name="q1" value="Казённое"><div class="eb-opt__dot"></div>Казённое учреждение</label>
+            <label class="eb-opt"><input type="radio" name="q1" value="Бюджетное"><div class="eb-opt__dot"></div>Бюджетное учреждение</label>
+            <label class="eb-opt"><input type="radio" name="q1" value="Автономное"><div class="eb-opt__dot"></div>Автономное учреждение</label>
+          </div>
+          <div class="eb-nav">
+            <button class="eb-btn eb-btn--ghost eb-prev" style="visibility:hidden" aria-label="Назад">← Назад</button>
+            <button class="eb-btn eb-btn--primary eb-next" aria-label="Далее">Далее →</button>
+          </div>
+        </div>
+
+        <!-- Шаг 2: роль -->
+        <div class="eb-step" id="step1">
+          <div class="eb-step__q">Ваша роль в учреждении:</div>
+          <div class="eb-options" role="radiogroup" aria-label="Роль в учреждении">
+            <label class="eb-opt"><input type="radio" name="q2" value="Главный бухгалтер"><div class="eb-opt__dot"></div>Главный бухгалтер</label>
+            <label class="eb-opt"><input type="radio" name="q2" value="Экономист / ФЭО"><div class="eb-opt__dot"></div>Экономист / специалист ФЭО</label>
+            <label class="eb-opt"><input type="radio" name="q2" value="Руководитель"><div class="eb-opt__dot"></div>Руководитель / заместитель</label>
+            <label class="eb-opt"><input type="radio" name="q2" value="Специалист по закупкам"><div class="eb-opt__dot"></div>Специалист по закупкам / учёту</label>
+          </div>
+          <div class="eb-nav">
+            <button class="eb-btn eb-btn--ghost eb-prev" aria-label="Назад">← Назад</button>
+            <button class="eb-btn eb-btn--primary eb-next" aria-label="Далее">Далее →</button>
+          </div>
+        </div>
+
+        <!-- Шаг 3: документы -->
+        <div class="eb-step" id="step2">
+          <div class="eb-step__q">Учётная политика и локальные акты на 2026 год:</div>
+          <div class="eb-options" role="radiogroup" aria-label="Учётная политика">
+            <label class="eb-opt"><input type="radio" name="q3" value="no"><div class="eb-opt__dot"></div>Не обновляли — работаем по старым</label>
+            <label class="eb-opt"><input type="radio" name="q3" value="partial"><div class="eb-opt__dot"></div>Частично обновляли, но не уверены в формулировках</label>
+            <label class="eb-opt"><input type="radio" name="q3" value="done"><div class="eb-opt__dot"></div>Обновили, нужна финальная проверка</label>
+          </div>
+          <div class="eb-nav">
+            <button class="eb-btn eb-btn--ghost eb-prev" aria-label="Назад">← Назад</button>
+            <button class="eb-btn eb-btn--primary eb-next" aria-label="Далее">Далее →</button>
+          </div>
+        </div>
+
+        <!-- Шаг 4: процессы -->
+        <div class="eb-step" id="step3">
+          <div class="eb-step__q">Как выстроена работа по переходу на новые ФСБУ:</div>
+          <div class="eb-options" role="radiogroup" aria-label="Переход на ФСБУ">
+            <label class="eb-opt"><input type="radio" name="q4" value="no"><div class="eb-opt__dot"></div>Фрагментарно — каждый делает как понимает</label>
+            <label class="eb-opt"><input type="radio" name="q4" value="partial"><div class="eb-opt__dot"></div>Есть частичный порядок, роли не до конца закреплены</label>
+            <label class="eb-opt"><input type="radio" name="q4" value="done"><div class="eb-opt__dot"></div>Порядок в целом выстроен, остались отдельные участки</label>
+          </div>
+          <div class="eb-nav">
+            <button class="eb-btn eb-btn--ghost eb-prev" aria-label="Назад">← Назад</button>
+            <button class="eb-btn eb-btn--primary eb-next" aria-label="Далее">Далее →</button>
+          </div>
+        </div>
+
+        <!-- Шаг 5: контроль -->
+        <div class="eb-step" id="step4">
+          <div class="eb-step__q">Внутренний контроль по новым требованиям 2026 года:</div>
+          <div class="eb-options" role="radiogroup" aria-label="Внутренний контроль">
+            <label class="eb-opt"><input type="radio" name="q5" value="no"><div class="eb-opt__dot"></div>Слабый — ошибки выявляем уже по факту</label>
+            <label class="eb-opt"><input type="radio" name="q5" value="partial"><div class="eb-opt__dot"></div>Частичный — не все участки покрыты проверкой</label>
+            <label class="eb-opt"><input type="radio" name="q5" value="done"><div class="eb-opt__dot"></div>Рабочий — нужна точечная корректировка</label>
+          </div>
+          <div class="eb-nav">
+            <button class="eb-btn eb-btn--ghost eb-prev" aria-label="Назад">← Назад</button>
+            <button class="eb-btn eb-btn--primary eb-next" aria-label="Далее">Далее →</button>
+          </div>
+        </div>
+
+        <!-- Шаг 6: фокус -->
+        <div class="eb-step" id="step5">
+          <div class="eb-step__q">Что сейчас важнее всего для вас:</div>
+          <div class="eb-options" role="radiogroup" aria-label="Приоритет">
+            <label class="eb-opt"><input type="radio" name="q6" value="start"><div class="eb-opt__dot"></div>Понять, что делать первым</label>
+            <label class="eb-opt"><input type="radio" name="q6" value="docs"><div class="eb-opt__dot"></div>Проверить комплект документов</label>
+            <label class="eb-opt"><input type="radio" name="q6" value="mgmt"><div class="eb-opt__dot"></div>Подготовить позицию для руководителя</label>
+            <label class="eb-opt"><input type="radio" name="q6" value="refine"><div class="eb-opt__dot"></div>Перейти к точечной доработке формулировок</label>
+          </div>
+          <div class="eb-nav">
+            <button class="eb-btn eb-btn--ghost eb-prev" aria-label="Назад">← Назад</button>
+            <button class="eb-btn eb-btn--primary eb-next" aria-label="Построить матрицу">Построить матрицу →</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Gate: email -->
+      <div class="eb-gate" id="ebGate">
+        <button class="eb-gate__back" id="ebGateBack" aria-label="Вернуться к вопросам">← Изменить ответы</button>
+
+        <div class="eb-gate__icon">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div class="eb-gate__title">Матрица сформирована — отправляем результат</div>
+        <div class="eb-gate__sub">На основе ваших ответов определён статус готовности учреждения. Укажите email — пришлём матрицу и рекомендации.</div>
+        <div class="eb-gate__list">
+          <div class="eb-gate__item">
+            <span class="eb-gate__check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></span>
+            Статус готовности учреждения к 2026 году
+          </div>
+          <div class="eb-gate__item">
+            <span class="eb-gate__check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></span>
+            Слабый контур по 4 управленческим зонам
+          </div>
+          <div class="eb-gate__item">
+            <span class="eb-gate__check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></span>
+            Первый управленческий шаг
+          </div>
+          <div class="eb-gate__item">
+            <span class="eb-gate__check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></span>
+            Детальный самоаудит учётной политики
+          </div>
+        </div>
+
+        <!-- ФОРМА — action заменит разработчик на вебхук -->
+        <form id="ebGateForm">
+          <input type="hidden" name="segment" id="ebSegment">
+          <input type="hidden" name="q1" id="h_q1">
+          <input type="hidden" name="q2" id="h_q2">
+          <input type="hidden" name="q3" id="h_q3">
+          <input type="hidden" name="q4" id="h_q4">
+          <input type="hidden" name="q5" id="h_q5">
+          <input type="hidden" name="q6" id="h_q6">
+          <input type="hidden" name="source" value="quiz-main">
+
+          <div class="eb-gate__error-msg" id="ebGateError">Не удалось отправить данные. Проверьте подключение и попробуйте ещё раз.</div>
+
+          <div class="eb-gate__row">
+            <input class="eb-gate__input" type="email" name="email" id="ebEmail" placeholder="Рабочий email" required aria-label="Рабочий email">
+            <button type="submit" class="eb-btn eb-btn--primary" id="ebSubmitBtn" aria-label="Получить результат">Получить →</button>
+          </div>
+          <p class="eb-gate__note">Данные используются только для отправки результата. Соответствует 152-ФЗ.</p>
+        </form>
+      </div>
+
+      <!-- Успех -->
+      <div class="eb-success" id="ebSuccess">
+        <div class="eb-success__icon">✅</div>
+        <div class="eb-success__title">Матрица направлена на ваш email</div>
+        <div class="eb-success__sub">Проверьте почту — в письме статус готовности, слабый контур и первый шаг. Пока ждёте письмо — пройдите детальный самоаудит учётной политики прямо сейчас.</div>
+        <a href="https://e-budget.ru/audit-2026.html" class="eb-success__link">Перейти к детальному самоаудиту →</a>
+      </div>
+
+    </div><!-- /card -->
+  </div><!-- /wrap -->
+</section>
+
+<script>
+(function() {
+  const TOTAL = 6;
+  let step = 0;
+  let isSubmitting = false;
+
+  const steps    = document.querySelectorAll('.eb-step');
+  const progWrap = document.getElementById('ebProg');
+  const progFill = document.getElementById('ebProgFill');
+  const progLabel = document.getElementById('ebProgLabel');
+  const progPct  = document.getElementById('ebProgPct');
+  const stepsWrap = document.getElementById('ebSteps');
+  const gate     = document.getElementById('ebGate');
+  const gateForm = document.getElementById('ebGateForm');
+  const gateBack = document.getElementById('ebGateBack');
+  const success  = document.getElementById('ebSuccess');
+  const submitBtn = document.getElementById('submitBtn');
+  const gateError = document.getElementById('ebGateError');
+  const emailInput = document.getElementById('ebEmail');
+
+  /* Вебхук — URL вашего backend API */
+  const WEBHOOK_URL = 'https://e-budget.ru/api/quiz/submit';
+
+  function render(i) {
+    steps.forEach(function(s, idx) {
+      s.classList.toggle('active', idx === i);
+    });
+
+    var pct = Math.round(((i + 1) / TOTAL) * 100);
+    progFill.style.width = pct + '%';
+    progLabel.textContent = 'Шаг ' + (i + 1) + ' из ' + TOTAL;
+    progPct.textContent = pct + '%';
+
+    /* Кнопка «Назад» — скрываем на первом шаге */
+    var currentPrev = steps[i].querySelector('.eb-prev');
+    if (currentPrev) {
+      currentPrev.style.visibility = i === 0 ? 'hidden' : 'visible';
+    }
+
+    /* Текст кнопки «Далее» на последнем шаге */
+    var currentNext = steps[i].querySelector('.eb-next');
+    if (currentNext) {
+      currentNext.textContent = i === TOTAL - 1 ? 'Построить матрицу →' : 'Далее →';
+    }
+  }
+
+  function val(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+
+  function calcSegment() {
+    var score = 0;
+
+    var q3 = val('q3');
+    if (q3 === 'done') score += 2;
+    else if (q3 === 'partial') score += 1;
+
+    var q4 = val('q4');
+    if (q4 === 'done') score += 2;
+    else if (q4 === 'partial') score += 1;
+
+    var q5 = val('q5');
+    if (q5 === 'done') score += 2;
+    else if (q5 === 'partial') score += 1;
+
+    if (score <= 2) return '1';
+    if (score <= 4) return '2';
+    return '3';
+  }
+
+  function sanitize(str) {
+    /* Базовая очистка — убираем HTML-теги и обрезаем пробелы */
+    return typeof str === 'string'
+      ? str.replace(/<[^>]*>/g, '').trim().slice(0, 200)
+      : '';
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function showGate() {
+    stepsWrap.style.display = 'none';
+    progWrap.classList.add('eb-prog--hidden');
+    gate.style.display = 'block';
+    gateError.style.display = 'none';
+
+    document.getElementById('ebSegment').value = calcSegment();
+    document.getElementById('h_q1').value = sanitize(val('q1'));
+    document.getElementById('h_q2').value = sanitize(val('q2'));
+    document.getElementById('h_q3').value = sanitize(val('q3'));
+    document.getElementById('h_q4').value = sanitize(val('q4'));
+    document.getElementById('h_q5').value = sanitize(val('q5'));
+    document.getElementById('h_q6').value = sanitize(val('q6'));
+  }
+
+  function showSteps() {
+    gate.style.display = 'none';
+    gateError.style.display = 'none';
+    stepsWrap.style.display = 'block';
+    progWrap.classList.remove('eb-prog--hidden');
+  }
+
+  /* ── Навигация: Далее / Назад ── */
+  document.addEventListener('click', function(e) {
+    /* Кнопка «Далее» */
+    var nextBtn = e.target.closest('.eb-next');
+    if (nextBtn) {
+      var checked = steps[step].querySelector('input:checked');
+      if (!checked) {
+        steps[step].classList.add('shake');
+        setTimeout(function() { steps[step].classList.remove('shake'); }, 400);
+        return;
+      }
+
+      if (step < TOTAL - 1) {
+        step++;
+        render(step);
+      } else {
+        showGate();
+      }
+      return;
+    }
+
+    /* Кнопка «Назад» */
+    var prevBtn = e.target.closest('.eb-prev');
+    if (prevBtn) {
+      if (step > 0) {
+        step--;
+        render(step);
+      }
+      return;
+    }
+
+    /* Кнопка «Изменить ответы» на гейте */
+    if (e.target.closest('#ebGateBack')) {
+      showSteps();
+      render(step);
+      return;
+    }
+  });
+
+  /* ── Отправка формы ── */
+  gateForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    if (isSubmitting) return;
+
+    /* Валидация email */
+    var email = emailInput.value.trim();
+    if (!isValidEmail(email)) {
+      emailInput.classList.add('eb-gate__input--error');
+      emailInput.focus();
+      setTimeout(function() { emailInput.classList.remove('eb-gate__input--error'); }, 2000);
+      return;
+    }
+
+    isSubmitting = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Отправка…';
+    gateError.style.display = 'none';
+
+    var data = {
+      email: sanitize(email),
+      segment: document.getElementById('ebSegment').value,
+      institution: document.getElementById('h_q1').value,
+      role: document.getElementById('h_q2').value,
+      docs: document.getElementById('h_q3').value,
+      processes: document.getElementById('h_q4').value,
+      control: document.getElementById('h_q5').value,
+      focus: document.getElementById('h_q6').value,
+      source: 'quiz-main'
+    };
+
+    fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(function() {
+      gate.style.display = 'none';
+      success.style.display = 'block';
+    })
+    .catch(function() {
+      /* Показываем ошибку вместо ложного успеха */
+      isSubmitting = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Получить →';
+      gateError.style.display = 'block';
+    });
+  });
+
+  render(0);
+})();
+</script>
+
+</body>
+</html>

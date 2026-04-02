@@ -3,8 +3,12 @@
 ## Список всех столбцов и их формулы
 
 ### 1. ID
-**Тип:** SingleLineText (автоматический)
-**Формула:** Нет
+**Тип:** Formula
+**Формула:**
+```
+CONCAT("rec", {Id})
+```
+**Примечание:** Использует системное поле `Id` (числовое) и добавляет префикс "rec"
 
 ### 2. Имя
 **Тип:** SingleLineText
@@ -13,14 +17,7 @@
 ### 3. Email
 **Тип:** Email
 **Формула:** Нет
-
-### 4. html_psy
-**Тип:** Formula
-**Формула:**
-```
-CONCAT("<script>$(\".fio .tn-atom\").html(\"", IF({Имя}, {Имя}, ""), "\");</script>")
-```
-
+ 
 ### 5. Кто привёл
 **Тип:** LinkToAnotherRecord (Link to Users, Many to One)
 **Формула:** Нет (это связь)
@@ -43,7 +40,7 @@ CONCAT("<script>$('.example-1 .tn-atom').text('https://e-budget.ru/members/signu
 **Тип:** SingleSelect
 **Опции:** 🥈Базовый, 🥇Про
 **Формула:** Нет
-
+  
 ### 9. Дата продления
 **Тип:** DateTime
 **Формула:** Нет

@@ -6,6 +6,7 @@ const config = require('./config');
 // Routes
 const widgetRoutes = require('./routes/widget');
 const webhookRoutes = require('./routes/webhook');
+const quizRoutes = require('./routes/quiz');
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api/widget', widgetRoutes);
 app.use('/api/webhook', webhookRoutes);
+app.use('/api/quiz', quizRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -71,6 +73,7 @@ app.listen(PORT, () => {
   console.log('  POST /api/widget/purchases');
   console.log('  POST /api/webhook/tilda');
   console.log('  POST /api/webhook/tilda/signup');
+  console.log('  POST /api/quiz/submit');
   console.log('='.repeat(50));
 });
 
