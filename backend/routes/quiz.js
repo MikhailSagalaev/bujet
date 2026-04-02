@@ -25,21 +25,145 @@ router.post('/submit', async (req, res) => {
     else if (processes === 'no') weakPoint = 'процессы';
     else if (control === 'no') weakPoint = 'контроль';
 
-    // Формируем HTML письма
+    // Текстовая версия письма
+    const textContent = `
+Матрица готовности к 2026 году
+Результаты диагностики учреждения
+
+СТАТУС ГОТОВНОСТИ: ${status}
+
+Тип учреждения: ${institution}
+Ваша роль: ${role}
+
+СЛАБЫЙ КОНТУР: ${weakPoint}
+Это зона, которая требует первоочередного внимания для успешного перехода на новые стандарты.
+
+ВАШИ ОТВЕТЫ:
+- Учётная политика: ${docs === 'done' ? 'Обновлена' : docs === 'partial' ? 'Частично обновлена' : 'Не обновлена'}
+- Процессы ФСБУ: ${processes === 'done' ? 'Выстроены' : processes === 'partial' ? 'Частично выстроены' : 'Фрагментарны'}
+- Внутренний контроль: ${control === 'done' ? 'Рабочий' : control === 'partial' ? 'Частичный' : 'Слабый'}
+- Приоритет: ${focus === 'start' ? 'Понять первый шаг' : focus === 'docs' ? 'Проверить документы' : focus === 'mgmt' ? 'Подготовить позицию' : 'Точечная доработка'}
+
+ПЕРВЫЙ ШАГ:
+${segment === '1' ? 'Начните с аудита учётной политики и локальных актов. Это фундамент для дальнейшей работы.' : segment === '2' ? 'Доработайте процессы и усильте контроль в слабых зонах.' : 'Проведите финальную проверку и точечную корректировку формулировок.'}
+
+Перейти к детальному самоаудиту: https://e-budget.ru/audit-2026.html
+
+---
+e-budget.ru — Практические инструменты для бюджетного учёта
+Данные обрабатываются в соответствии с 152-ФЗ
+    `.trim();
+
+    // HTML версия письма
     const htmlContent = `
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Матрица готовности к 2026 году</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #1a1f2e; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(90deg, #00C9A7, #0ea5e9); padding: 30px; border-radius: 12px; color: white; text-align: center; }
-    .content { background: #f7f7f7; padding: 30px; margin-top: 20px; border-radius: 12px; }
-    .status { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #00C9A7; }
-    .weak { background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; }
-    .action { background: #00C9A7; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; margin-top: 20px; }
-    .footer { text-align: center; color: #64748b; font-size: 14px; margin-top: 30px; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+      line-height: 1.6; 
+      color: #333333;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    .container { 
+      max-width: 600px; 
+      margin: 0 auto; 
+      background-color: #ffffff;
+    }
+    .header { 
+      background-color: #00C9A7;
+      padding: 30px 20px;
+      text-align: center;
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0 0 10px 0;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    .header p {
+      margin: 0;
+      font-size: 16px;
+      opacity: 0.95;
+    }
+    .content { 
+      padding: 30px 20px;
+    }
+    .status { 
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid #00C9A7;
+    }
+    .status h2 {
+      margin: 0 0 15px 0;
+      font-size: 20px;
+      color: #1a1f2e;
+    }
+    .status p {
+      margin: 8px 0;
+      color: #495057;
+    }
+    .weak { 
+      background-color: #fff3cd;
+      border: 1px solid #ffc107;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .weak h3 {
+      margin: 0 0 10px 0;
+      font-size: 18px;
+      color: #856404;
+    }
+    .weak p {
+      margin: 0;
+      color: #856404;
+    }
+    .section {
+      margin: 25px 0;
+    }
+    .section h3 {
+      font-size: 18px;
+      color: #1a1f2e;
+      margin: 0 0 15px 0;
+    }
+    .section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .section li {
+      margin: 8px 0;
+      color: #495057;
+    }
+    .action-button { 
+      display: inline-block;
+      background-color: #00C9A7;
+      color: #ffffff !important;
+      padding: 14px 28px;
+      text-decoration: none;
+      border-radius: 6px;
+      margin: 20px 0;
+      font-weight: 600;
+      text-align: center;
+    }
+    .footer { 
+      text-align: center;
+      color: #6c757d;
+      font-size: 13px;
+      padding: 20px;
+      border-top: 1px solid #e9ecef;
+    }
+    .footer p {
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
@@ -51,32 +175,38 @@ router.post('/submit', async (req, res) => {
     
     <div class="content">
       <div class="status">
-        <h2>📊 Статус готовности: ${status}</h2>
+        <h2>Статус готовности: ${status}</h2>
         <p><strong>Тип учреждения:</strong> ${institution}</p>
         <p><strong>Ваша роль:</strong> ${role}</p>
       </div>
 
       <div class="weak">
-        <h3>⚠️ Слабый контур: ${weakPoint}</h3>
+        <h3>Слабый контур: ${weakPoint}</h3>
         <p>Это зона, которая требует первоочередного внимания для успешного перехода на новые стандарты.</p>
       </div>
 
-      <h3>Ваши ответы:</h3>
-      <ul>
-        <li><strong>Учётная политика:</strong> ${docs === 'done' ? 'Обновлена' : docs === 'partial' ? 'Частично обновлена' : 'Не обновлена'}</li>
-        <li><strong>Процессы ФСБУ:</strong> ${processes === 'done' ? 'Выстроены' : processes === 'partial' ? 'Частично выстроены' : 'Фрагментарны'}</li>
-        <li><strong>Внутренний контроль:</strong> ${control === 'done' ? 'Рабочий' : control === 'partial' ? 'Частичный' : 'Слабый'}</li>
-        <li><strong>Приоритет:</strong> ${focus === 'start' ? 'Понять первый шаг' : focus === 'docs' ? 'Проверить документы' : focus === 'mgmt' ? 'Подготовить позицию' : 'Точечная доработка'}</li>
-      </ul>
+      <div class="section">
+        <h3>Ваши ответы:</h3>
+        <ul>
+          <li><strong>Учётная политика:</strong> ${docs === 'done' ? 'Обновлена' : docs === 'partial' ? 'Частично обновлена' : 'Не обновлена'}</li>
+          <li><strong>Процессы ФСБУ:</strong> ${processes === 'done' ? 'Выстроены' : processes === 'partial' ? 'Частично выстроены' : 'Фрагментарны'}</li>
+          <li><strong>Внутренний контроль:</strong> ${control === 'done' ? 'Рабочий' : control === 'partial' ? 'Частичный' : 'Слабый'}</li>
+          <li><strong>Приоритет:</strong> ${focus === 'start' ? 'Понять первый шаг' : focus === 'docs' ? 'Проверить документы' : focus === 'mgmt' ? 'Подготовить позицию' : 'Точечная доработка'}</li>
+        </ul>
+      </div>
 
-      <h3>🎯 Первый шаг:</h3>
-      <p>${segment === '1' ? 'Начните с аудита учётной политики и локальных актов. Это фундамент для дальнейшей работы.' : segment === '2' ? 'Доработайте процессы и усильте контроль в слабых зонах.' : 'Проведите финальную проверку и точечную корректировку формулировок.'}</p>
+      <div class="section">
+        <h3>Первый шаг:</h3>
+        <p>${segment === '1' ? 'Начните с аудита учётной политики и локальных актов. Это фундамент для дальнейшей работы.' : segment === '2' ? 'Доработайте процессы и усильте контроль в слабых зонах.' : 'Проведите финальную проверку и точечную корректировку формулировок.'}</p>
+      </div>
 
-      <a href="https://e-budget.ru/audit-2026.html" class="action">Перейти к детальному самоаудиту →</a>
+      <center>
+        <a href="https://e-budget.ru/audit-2026.html" class="action-button">Перейти к детальному самоаудиту</a>
+      </center>
     </div>
 
     <div class="footer">
-      <p>e-budget.ru — Практические инструменты для бюджетного учёта</p>
+      <p><strong>e-budget.ru</strong> — Практические инструменты для бюджетного учёта</p>
       <p>Данные обрабатываются в соответствии с 152-ФЗ</p>
     </div>
   </div>
@@ -92,6 +222,7 @@ router.post('/submit', async (req, res) => {
       from: 'E-Budget <noreply@e-budget.ru>',
       to: email,
       subject: `Матрица готовности к 2026 году — ${status}`,
+      text: textContent,
       html: htmlContent
     });
 
