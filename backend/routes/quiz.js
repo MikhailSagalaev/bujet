@@ -65,8 +65,7 @@ router.post('/submit', async (req, res) => {
         control: control || '',
         focus: focus || '',
         source: source || 'quiz-main',
-        email_id: data.id,
-        created_at: new Date().toISOString()
+        email_id: data.id
       });
       console.log('Quiz result saved to NocoDB');
     } catch (nocodbError) {
