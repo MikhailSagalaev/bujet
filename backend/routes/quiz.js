@@ -23,8 +23,8 @@ router.post('/submit', async (req, res) => {
     const segmentData = segmentMap[segment] || segmentMap['1'];
     const status = segmentData.status;
 
-    // Читаем HTML шаблон из файла (файлы в корне проекта)
-    const templatePath = path.join(__dirname, '..', '..', segmentData.file);
+    // Читаем HTML шаблон из папки email-templates
+    const templatePath = path.join(__dirname, '..', 'email-templates', segmentData.file);
     
     if (!fs.existsSync(templatePath)) {
       console.error('Template file not found:', templatePath);
