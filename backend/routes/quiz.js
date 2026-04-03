@@ -2,11 +2,12 @@ const express = require('express');
 const { Resend } = require('resend');
 const fs = require('fs');
 const path = require('path');
+const nocodb = require('../services/nocodb');
 const router = express.Router();
 
 router.post('/submit', async (req, res) => {
   try {
-    const { email, segment } = req.body;
+    const { email, segment, institution, role, docs, processes, control, focus, source } = req.body;
 
     // Валидация
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -50,6 +51,28 @@ router.post('/submit', async (req, res) => {
     }
 
     console.log('Email sent:', data);
+
+    // Сохраняем результат в NocoDB
+    try {
+      await nocodb.createRecord('quiz_results', {
+        email,
+        segment,
+        status,
+        institution: institution || '',
+        role: role || '',
+        docs: docs || '',
+        processes: processes || '',
+        control: control || '',
+        focus: focus || '',
+        source: source || 'quiz-main',
+        email_id: data.id,
+        created_at: new Date().toISOString()
+      });
+      console.log('Quiz result saved to NocoDB');
+    } catch (nocodbError) {
+      console.error('NocoDB save error:', nocodbError);
+      // Не прерываем выполнение, если NocoDB недоступен
+    }
 
     res.json({ success: true, message: 'Email отправлен' });
 
