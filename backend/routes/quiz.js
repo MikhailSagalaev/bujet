@@ -70,7 +70,7 @@ router.post('/submit', async (req, res) => {
       };
       console.log('Record data:', JSON.stringify(recordData));
       
-      const result = await nocodb.createRecord('quiz', recordData);
+      const result = await nocodb.createRecord('vwat48jrb1auxmyo', recordData);
       console.log('Quiz result saved to NocoDB:', result);
     } catch (nocodbError) {
       console.error('NocoDB save error:', nocodbError.message);
