@@ -277,6 +277,23 @@ class NocoDBService {
       throw error;
     }
   }
+
+  /**
+   * Создать запись в любой таблице
+   */
+  async createRecord(tableName, recordData) {
+    try {
+      const response = await axios.post(
+        `${this.baseURL}/${tableName}`,
+        recordData,
+        { headers: this.headers }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error creating record in ${tableName}:`, error.message);
+      throw error;
+    }
+  }
 }
 
 module.exports = new NocoDBService();
