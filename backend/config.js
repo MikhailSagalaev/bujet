@@ -9,7 +9,8 @@ module.exports = {
     tables: {
       users: 'mc23d0yamksjtys',        // Users (created by setup script)
       courses: 'myj1um1tommd7s6',      // Courses (created by setup script)
-      purchases: 'msf2dwart0cicac'     // Purchases (created by setup script)
+      purchases: 'msf2dwart0cicac',    // Purchases (created by setup script)
+      quiz: 'm86t5uc463tanvz'          // Quiz results
     }
   },
 

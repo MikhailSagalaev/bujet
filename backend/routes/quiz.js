@@ -3,6 +3,7 @@ const { Resend } = require('resend');
 const fs = require('fs');
 const path = require('path');
 const nocodb = require('../services/nocodb');
+const config = require('../config');
 const router = express.Router();
 
 router.post('/submit', async (req, res) => {
@@ -70,7 +71,7 @@ router.post('/submit', async (req, res) => {
       };
       console.log('Record data:', JSON.stringify(recordData));
       
-      const result = await nocodb.createRecord('vwat48jrb1auxmyo', recordData);
+      const result = await nocodb.createRecord(config.nocodb.tables.quiz, recordData);
       console.log('Quiz result saved to NocoDB:', result);
     } catch (nocodbError) {
       console.error('NocoDB save error:', nocodbError.message);
