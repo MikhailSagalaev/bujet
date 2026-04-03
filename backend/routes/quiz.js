@@ -54,7 +54,7 @@ router.post('/submit', async (req, res) => {
 
     // Сохраняем результат в NocoDB
     try {
-      console.log('Attempting to save to NocoDB table: quiz-quiz');
+      console.log('Attempting to save to NocoDB table: quiz');
       const recordData = {
         email,
         segment,
@@ -70,7 +70,7 @@ router.post('/submit', async (req, res) => {
       };
       console.log('Record data:', JSON.stringify(recordData));
       
-      const result = await nocodb.createRecord('quiz-quiz', recordData);
+      const result = await nocodb.createRecord('quiz', recordData);
       console.log('Quiz result saved to NocoDB:', result);
     } catch (nocodbError) {
       console.error('NocoDB save error:', nocodbError.message);
