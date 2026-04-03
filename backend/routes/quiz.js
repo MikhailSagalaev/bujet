@@ -54,7 +54,7 @@ router.post('/submit', async (req, res) => {
 
     // Сохраняем результат в NocoDB
     try {
-      await nocodb.createRecord('quiz_results', {
+      await nocodb.createRecord('quiz-quiz', {
         email,
         segment,
         status,

@@ -1,0 +1,16 @@
+[
+  {
+    "email": "example@test.ru",
+    "segment": "1",
+    "status": "Стартовая зона",
+    "institution": "Казённое",
+    "role": "Главный бухгалтер",
+    "docs": "no",
+    "processes": "partial",
+    "control": "no",
+    "focus": "start",
+    "source": "quiz-main",
+    "email_id": "example-id-123",
+    "created_at": "2026-04-03T09:00:00.000Z"
+  }
+]
